@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/mine.png</file>
+        <file>resources/flag.png</file>
+        <file>resources/field.png</file>
+        <file>resources/empty.png</file>
+        <file>resources/nearby1.png</file>
+        <file>resources/nearby2.png</file>
+        <file>resources/nearby3.png</file>
+        <file>resources/nearby4.png</file>
+        <file>resources/nearby5.png</file>
+        <file>resources/nearby6.png</file>
+        <file>resources/nearby7.png</file>
+        <file>resources/nearby8.png</file>
+        <file>resources/mine_exploded.png</file>
+        <file>resources/unknown.png</file>
+    </qresource>
+</RCC>
