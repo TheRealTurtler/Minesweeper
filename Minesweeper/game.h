@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QGridLayout>
+#include <QBoxLayout>
 #include <QIcon>
 #include <random>
 #include <algorithm>
@@ -53,6 +54,7 @@ private:
     const unsigned int mColumns = 0;    // Spielfeld Spalten
     const unsigned int mRows = 0;       // Spielfeld Reihen
     const unsigned int mMines = 0;      // Auf dem Spielfeld platzierte Mienen
+    const unsigned int mSpace = 4;      // Abstand zwischen den Feldern
 
     unsigned int mFlags = 0;            // Anzahl gesetzter Flaggen
 

@@ -8,7 +8,7 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
     // Layout erstellen
     //QHBoxLayout* layoutH = new QHBoxLayout;
     //QVBoxLayout* layoutV = new QVBoxLayout;
-    QGridLayout* gameLayout = new QGridLayout(this);
+    //QGridLayout* gameLayout = new QGridLayout(this);
 
     // TODO
     // Mienenfeldgröße initialisieren
@@ -30,7 +30,9 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
             mineField->setPixmap(mineField->pixmap().scaled(mMineFieldSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
             mineField->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-            gameLayout->addWidget(mineField, r, c);
+            //gameLayout->addWidget(mineField, r, c);
+
+            mineField->setGeometry(c * (mMineFieldSize.width() + mSpace), r * (mMineFieldSize.height() + mSpace), mMineFieldSize.width(), mMineFieldSize.height());
 
             connect(mineField, &MineField::leftClicked, this, &Game::slotSearchField);
             connect(mineField, &MineField::rightClicked, this, &Game::slotFlagMine);
@@ -38,6 +40,19 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
             mMineGrid.at(c + r * mColumns) = mineField;
         }
     }
+
+    setMinimumSize(mColumns * mMineFieldSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldSize.height() + (mRows - 1) * mSpace);
+
+    //auto layout = new QVBoxLayout(this);
+
+    //layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::Ignored));
+
+    //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    //adjustSize();
+
+
+
 
     /*  // Macht keinen Unterschied
     for(unsigned int i = 0; i < mRows; ++i)
@@ -52,7 +67,7 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
     */
 
     // Abstand zwischen den Feldern festlegen
-    gameLayout->setSpacing(4);
+    //gameLayout->setSpacing(mSpace);
 
     // TODO
     // Spacer im Spielfeld herum hinzufügen
@@ -467,15 +482,16 @@ void Game::resizeEvent(QResizeEvent *event)
 {
     // TODO
 
+    /*
     // Größe der Felder berechnen
-    if(width() >= height())
+    if(event->size().width() > event->size().height())
     {
-        int fieldHeight = (height() - layout()->spacing() * (mRows - 1)) / mRows;
+        int fieldHeight = (event->size().height() - layout()->spacing() * (mRows - 1)) / mRows;
         mMineFieldSize = QSize(fieldHeight, fieldHeight);
     }
     else
     {
-        int fieldWidth = (width() - layout()->spacing() * (mColumns - 1)) / mColumns;
+        int fieldWidth = (event->size().width() - layout()->spacing() * (mColumns - 1)) / mColumns;
         mMineFieldSize = QSize(fieldWidth, fieldWidth);
     }
 
@@ -484,6 +500,7 @@ void Game::resizeEvent(QResizeEvent *event)
     {
         it->setPixmap(it->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
+    */
 
     QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())
             + " | Field size: " + QString::number(mMineFieldSize.width()) + ", " + QString::number(mMineFieldSize.height())

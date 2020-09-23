@@ -20,6 +20,9 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     connect(game, &Game::flagAdded, mineCounter, &MineCounter::displayRemainingMines);
     connect(game, &Game::flagRemoved, mineCounter, &MineCounter::displayRemainingMines);
 
+
+    game->setAutoFillBackground(true);
+    game->setPalette(QPalette(QPalette::Background, Qt::green));
     /*
     timer->setAutoFillBackground(true);
     timer->setPalette(QPalette(QPalette::Background, Qt::red));
@@ -32,7 +35,7 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
 
     game->mStatusBar = mStatusBar;
 
-    game->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    game->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     layoutV2->addStretch(1);
     layoutV2->addWidget(timer);
@@ -43,14 +46,14 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
     layoutH->addStretch(1);
     //layoutH->addWidget(game, 0, Qt::AlignCenter);
-    layoutH->addWidget(game);
+    layoutH->addWidget(game, 0);
     layoutH->addLayout(layoutV2);
     layoutH->addStretch(1);
     //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
     //layoutV1->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
     layoutV1->addStretch(1);
-    layoutV1->addLayout(layoutH);
+    layoutV1->addLayout(layoutH, 0);
     layoutV1->addStretch(1);
     //layoutV1->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
