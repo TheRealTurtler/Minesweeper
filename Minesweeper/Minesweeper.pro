@@ -10,14 +10,20 @@ CONFIG += c++11
 
 SOURCES += \
     game.cpp \
+    interface.cpp \
     main.cpp \
     main_window.cpp \
-    mine_field.cpp
+    mine_counter.cpp \
+    mine_field.cpp \
+    timer.cpp
 
 HEADERS += \
     game.h \
+    interface.h \
     main_window.h \
-    mine_field.h
+    mine_counter.h \
+    mine_field.h \
+    timer.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

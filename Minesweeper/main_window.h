@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QStatusBar>
 
-#include "game.h"
+#include "interface.h"
 
 class MainWindow : public QMainWindow
 {
@@ -15,6 +15,5 @@ public:
     ~MainWindow();
 
 private:
-    Game* mGame = nullptr;
 };
 #endif // MAINWINDOW_H

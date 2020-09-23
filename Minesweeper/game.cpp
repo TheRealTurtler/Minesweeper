@@ -4,13 +4,11 @@
 Game::Game(const unsigned int columns, const unsigned int rows, const unsigned int mines, QWidget *parent)
     : QWidget(parent), mColumns(columns), mRows(rows), mMines(mines)
 {
-    //statusBar = new QStatusBar(this);
-
     // TODO
     // Layout erstellen
-    QHBoxLayout* layoutH = new QHBoxLayout;
-    QVBoxLayout* layoutV = new QVBoxLayout;
-    QGridLayout* gameLayout = new QGridLayout;
+    //QHBoxLayout* layoutH = new QHBoxLayout;
+    //QVBoxLayout* layoutV = new QVBoxLayout;
+    QGridLayout* gameLayout = new QGridLayout(this);
 
     // TODO
     // Mienenfeldgröße initialisieren
@@ -27,10 +25,10 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
         {
             MineField* mineField = new MineField(this);
 
-            mineField->setImage(QPixmap(":/resources/field.png"));
-            mineField->setScaledContents( true );
-            mineField->setMinimumSize(48, 48);
-            //mineField->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+            mineField->setMinimumSize(16, 16);
+            mineField->setScaledContents(true);
+            mineField->setPixmap(mineField->pixmap().scaled(mMineFieldSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            mineField->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
             gameLayout->addWidget(mineField, r, c);
 
@@ -41,21 +39,33 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
         }
     }
 
+    /*  // Macht keinen Unterschied
+    for(unsigned int i = 0; i < mRows; ++i)
+    {
+        gameLayout->setRowStretch(i, 0);
+    }
+
+    for(unsigned int i = 0; i < mColumns; ++i)
+    {
+        gameLayout->setColumnStretch(i, 0);
+    }
+    */
+
     // Abstand zwischen den Feldern festlegen
     gameLayout->setSpacing(4);
 
     // TODO
     // Spacer im Spielfeld herum hinzufügen
-    layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    layoutH->addLayout(gameLayout);
-    layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //layoutH->addLayout(gameLayout);
+    //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
-    layoutV->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    layoutV->addLayout(layoutH);
-    layoutV->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //layoutV->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    //layoutV->addLayout(layoutH);
+    //layoutV->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
-    // Layout anwenden
-    this->setLayout(layoutV);
+    // Layout anwenden -> bereits bei initialisierung geschehen
+    //this->setLayout(gameLayout);
 
     // RNG Initialisierung
     std::random_device randomDevice;
@@ -277,13 +287,21 @@ void Game::checkNearbyMines(const unsigned int index)
 // Angegebenes Feld aufdecken (wenn keine benachbarten Mienen -> benachbarte Felder aufdecken)
 void Game::searchField(MineField *mineField)
 {
+    if(mineField->flagState() == MineField::FLAGGED)
+    {
+        mineField->setFlagState(MineField::NONE);
+        --mFlags;
+        emit flagRemoved(mMines - mFlags);
+
+        return;
+    }
+
     if(!mineField->isMine())
     {
         mineField->setCleared(true);
 
-        switch(mineField->minesNearby())
+        if(!mineField->minesNearby())
         {
-        case 0:
             for(const auto& it : getNearby(mineField))
             {
                 if(!it->isMine() && !it->cleared())
@@ -291,35 +309,6 @@ void Game::searchField(MineField *mineField)
                     searchField(it);
                 }
             }
-
-            mineField->setImage(QPixmap(":/resources/empty.png"));
-            break;
-        case 1:
-            mineField->setImage(QPixmap(":/resources/nearby1.png"));
-            break;
-        case 2:
-            mineField->setImage(QPixmap(":/resources/nearby2.png"));
-            break;
-        case 3:
-            mineField->setImage(QPixmap(":/resources/nearby3.png"));
-            break;
-        case 4:
-            mineField->setImage(QPixmap(":/resources/nearby4.png"));
-            break;
-        case 5:
-            mineField->setImage(QPixmap(":/resources/nearby5.png"));
-            break;
-        case 6:
-            mineField->setImage(QPixmap(":/resources/nearby6.png"));
-            break;
-        case 7:
-            mineField->setImage(QPixmap(":/resources/nearby7.png"));
-            break;
-        case 8:
-            mineField->setPixmap(QPixmap(":/resources/nearby8.png"));
-            break;
-        default:
-            break;
         }
 
         // Überprüfe, ob alle Mienen gefunden wurden
@@ -338,6 +327,12 @@ void Game::searchField(MineField *mineField)
         {
             it->setImage(QPixmap(":/resources/mine.png"));
         }
+
+        // Signal für Spiel gewonnen ausgeben
+        emit gameFinished(true);
+
+        // Signal für 0 verbleibende Mienen ausgeben
+        emit flagAdded(0);
     }
     else
     {
@@ -350,7 +345,16 @@ void Game::searchField(MineField *mineField)
         {
             it->setImage(QPixmap(":/resources/mine_exploded.png"));
         }
+
+        // Signal für Spiel verloren ausgeben
+        emit gameFinished(false);
     }
+}
+
+// Anzahl platzierter Mienen zurückgeben
+unsigned int Game::minesPlaced() const
+{
+    return mMines;
 }
 
 // SLOT | Angeklicktes Feld aufdecken
@@ -405,6 +409,9 @@ void Game::slotSearchField()
 
         // Vorteil bei ersten Klick deaktivieren
         mFirstClick = false;
+
+        // Signal für Spielstart ausgeben
+        emit gameStarted();
     }
 
     // Auf geklicktem Feld nach Miene suchen
@@ -436,17 +443,18 @@ void Game::slotFlagMine()
     {
     case MineField::NONE:
         // noch keine Flagge -> Flagge setzen
-        mineField->setImage(QPixmap(":/resources/flag.png"));
         mineField->setFlagState(MineField::FLAGGED);
+        ++mFlags;
+        emit flagAdded(mMines - mFlags);
         break;
     case MineField::FLAGGED:
         // Flagge gesetzt -> als unbekannt markieren
-        mineField->setImage(QPixmap(":/resources/unknown.png"));
         mineField->setFlagState(MineField::UNKNOWN);
+        --mFlags;
+        emit flagRemoved(mMines - mFlags);
         break;
     case MineField::UNKNOWN:
         // als unbekannt markiert -> Markierung entfernen
-        mineField->setImage(QPixmap(":/resources/field.png"));
         mineField->setFlagState(MineField::NONE);
         break;
     default:
@@ -457,27 +465,30 @@ void Game::slotFlagMine()
 // EVENT | Fenstergröße ändern
 void Game::resizeEvent(QResizeEvent *event)
 {
-    //statusBar->showMessage(QString::number(this->height()));
-
     // TODO
 
     // Größe der Felder berechnen
-    if(this->width() > this->height())
+    if(width() >= height())
     {
-        int height = (this->height() - this->layout()->spacing() * (mRows - 1)) / mRows;
-        mMineFieldSize = QSize(height, height);
+        int fieldHeight = (height() - layout()->spacing() * (mRows - 1)) / mRows;
+        mMineFieldSize = QSize(fieldHeight, fieldHeight);
     }
     else
     {
-        int width = (this->width() - this->layout()->spacing() * (mColumns - 1)) / mColumns;
-        mMineFieldSize = QSize(width, width);
+        int fieldWidth = (width() - layout()->spacing() * (mColumns - 1)) / mColumns;
+        mMineFieldSize = QSize(fieldWidth, fieldWidth);
     }
 
     // Felder auf berechnete Größe skalieren
     for(auto& it : mMineGrid)
     {
-        it->setPixmap(it->pixmap().scaled(mMineFieldSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        it->setPixmap(it->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
+
+    QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())
+            + " | Field size: " + QString::number(mMineFieldSize.width()) + ", " + QString::number(mMineFieldSize.height())
+            + " | Actual field size: " + QString::number(mMineGrid.at(0)->size().width()) + ", " + QString::number(mMineGrid.at(0)->size().height());
+    mStatusBar->showMessage(message);
 
     // Event weitergeben -> unnötig?
     QWidget::resizeEvent(event);

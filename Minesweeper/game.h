@@ -2,12 +2,11 @@
 #define GAME_H
 
 #include <QWidget>
-#include <QPushButton>
 #include <QGridLayout>
 #include <QIcon>
 #include <random>
 #include <algorithm>
-//#include <QStatusBar>
+#include <QStatusBar>
 
 #include "mine_field.h"
 
@@ -28,27 +27,39 @@ public:
     void checkNearbyMines(const unsigned int index);
     void searchField(MineField* mineField);
 
+    // Get und Set Funktionen
+    unsigned int minesPlaced() const;
+
+    // DEBUG
+    QStatusBar* mStatusBar = nullptr;
+
 public slots:
     void slotSearchField();
     void slotFlagMine();
 
 signals:
+    void gameStarted();
+    void gameFinished(bool win);
+    void flagAdded(int remainingMines);
+    void flagRemoved(int remainingMines);
 
 protected:
    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    std::vector<MineField*> mMineGrid;
-    std::vector<MineField*> mExplosiveFields;
+    std::vector<MineField*> mMineGrid;          // Spielfeld
+    std::vector<MineField*> mExplosiveFields;   // Felder mit Mienen
 
-    const unsigned int mColumns = 0;
-    const unsigned int mRows = 0;
-    const unsigned int mMines = 0;
+    const unsigned int mColumns = 0;    // Spielfeld Spalten
+    const unsigned int mRows = 0;       // Spielfeld Reihen
+    const unsigned int mMines = 0;      // Auf dem Spielfeld platzierte Mienen
+
+    unsigned int mFlags = 0;            // Anzahl gesetzter Flaggen
 
     bool mFirstClick = true;
     bool mGameOver = false;
 
-    QSize mMineFieldSize;
+    QSize mMineFieldSize;               // Größe eines Mienenfeldes
 
     // RNG
     std::mt19937 mRandomEngine;
