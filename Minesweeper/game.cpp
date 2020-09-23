@@ -10,10 +10,6 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
     //QVBoxLayout* layoutV = new QVBoxLayout;
     //QGridLayout* gameLayout = new QGridLayout(this);
 
-    // TODO
-    // Mienenfeldgröße initialisieren
-    mMineFieldSize = QSize(48, 48);
-
     // Vectorgröße anpassen
     mMineGrid.resize(mRows * mColumns);
     mMineGrid.shrink_to_fit();
@@ -25,10 +21,10 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
         {
             MineField* mineField = new MineField(this);
 
-            mineField->setMinimumSize(16, 16);
-            mineField->setScaledContents(true);
-            mineField->setPixmap(mineField->pixmap().scaled(mMineFieldSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            mineField->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            mineField->setMinimumSize(mMineFieldMinimumSize);
+            //mineField->setScaledContents(true);
+            //mineField->setPixmap(mineField->pixmap().scaled(mMineFieldSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            //mineField->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
             //gameLayout->addWidget(mineField, r, c);
 
@@ -41,7 +37,9 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
         }
     }
 
-    setMinimumSize(mColumns * mMineFieldSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldSize.height() + (mRows - 1) * mSpace);
+    setMinimumSize(mColumns * mMineFieldMinimumSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldMinimumSize.height() + (mRows - 1) * mSpace);
+
+    //resize(mColumns * mMineFieldSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldSize.height() + (mRows - 1) * mSpace);
 
     //auto layout = new QVBoxLayout(this);
 
@@ -317,19 +315,19 @@ void Game::searchField(MineField *mineField)
 
         if(!mineField->minesNearby())
         {
-            for(const auto& it : getNearby(mineField))
+            for(const auto& i : getNearby(mineField))
             {
-                if(!it->isMine() && !it->cleared())
+                if(!i->isMine() && !i->cleared())
                 {
-                    searchField(it);
+                    searchField(i);
                 }
             }
         }
 
         // Überprüfe, ob alle Mienen gefunden wurden
-        for(const auto& it : mMineGrid)
+        for(const auto& i : mMineGrid)
         {
-            if(!it->cleared() && !it->isMine())
+            if(!i->cleared() && !i->isMine())
             {
                 // Noch nicht alle Felder aufgedeckt
 
@@ -338,9 +336,9 @@ void Game::searchField(MineField *mineField)
         }
 
         // Alle Mienen gefunden
-        for(const auto& it : mExplosiveFields)
+        for(const auto& i : mExplosiveFields)
         {
-            it->setImage(QPixmap(":/resources/mine.png"));
+            i->setImage(QPixmap(":/resources/mine.png"));
         }
 
         // Signal für Spiel gewonnen ausgeben
@@ -356,14 +354,24 @@ void Game::searchField(MineField *mineField)
         mGameOver = true;
 
         // Alle Mienen explodieren
-        for(const auto& it : mExplosiveFields)
+        for(const auto& i : mExplosiveFields)
         {
-            it->setImage(QPixmap(":/resources/mine_exploded.png"));
+            i->setImage(QPixmap(":/resources/mine_exploded.png"));
         }
 
         // Signal für Spiel verloren ausgeben
         emit gameFinished(false);
     }
+}
+
+QPoint Game::getFieldPosition(unsigned int index)
+{
+    QPoint* pos = new QPoint();
+
+    pos->setX((index % mColumns) * (mMineFieldSize.width() + mSpace));
+    pos->setY((index / mColumns) * (mMineFieldSize.height() + mSpace));     // int division so gedacht
+
+    return *pos;
 }
 
 // Anzahl platzierter Mienen zurückgeben
@@ -391,9 +399,9 @@ void Game::slotSearchField()
     {
         // Auf geklicktes Feld und außenrum Mienen setzen
         mineField->setMine(true);
-        for(const auto& it : getNearby(mineField))
+        for(const auto& i : getNearby(mineField))
         {
-            it->setMine(true);
+            i->setMine(true);
         }
 
         // Minen verteilen (werden nur auf leere Felder gesetzt)
@@ -407,11 +415,11 @@ void Game::slotSearchField()
         }
 
         // Felder mit Mienen in extra vector speichern
-        for(const auto& it : mMineGrid)
+        for(const auto& i : mMineGrid)
         {
-            if(it->isMine())
+            if(i->isMine())
             {
-                mExplosiveFields.push_back(it);
+                mExplosiveFields.push_back(i);
             }
         }
         mExplosiveFields.shrink_to_fit();
@@ -480,33 +488,50 @@ void Game::slotFlagMine()
 // EVENT | Fenstergröße ändern
 void Game::resizeEvent(QResizeEvent *event)
 {
-    // TODO
+    // Wenn resizeEvent aufgerufen wird, hat das Widget bereits seine neue Größe
+    // -> kann einfach width(), height() verwenden
 
-    /*
+    int fieldSize;
+
     // Größe der Felder berechnen
-    if(event->size().width() > event->size().height())
+    if(width() > height())
     {
-        int fieldHeight = (event->size().height() - layout()->spacing() * (mRows - 1)) / mRows;
-        mMineFieldSize = QSize(fieldHeight, fieldHeight);
+        // Game Widget breiter als hoch
+
+        fieldSize = (height() - mSpace * (mRows - 1)) / mRows;          // int division genau genug
+        mMineFieldSize = QSize(fieldSize, fieldSize);
     }
     else
     {
-        int fieldWidth = (event->size().width() - layout()->spacing() * (mColumns - 1)) / mColumns;
-        mMineFieldSize = QSize(fieldWidth, fieldWidth);
+        // Game Widget höher als breit
+
+        fieldSize = (width() - mSpace * (mColumns - 1)) / mColumns;     // int division genau genug
+        mMineFieldSize = QSize(fieldSize, fieldSize);
     }
 
+    unsigned int idx = 0;
+
     // Felder auf berechnete Größe skalieren
-    for(auto& it : mMineGrid)
+    for(const auto& i : mMineGrid)
     {
-        it->setPixmap(it->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        i->move(getFieldPosition(idx));
+        i->resize(mMineFieldSize);
+
+        i->setPixmap(i->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+
+        //i->setGeometry(idx % mColumns, idx / mColumns, fieldSize, fieldSize);
+
+        //i->updateGeometry();
+
+        ++idx;
     }
-    */
 
     QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())
             + " | Field size: " + QString::number(mMineFieldSize.width()) + ", " + QString::number(mMineFieldSize.height())
-            + " | Actual field size: " + QString::number(mMineGrid.at(0)->size().width()) + ", " + QString::number(mMineGrid.at(0)->size().height());
+            + " | Actual field size: " + QString::number(mMineGrid.at(0)->size().width()) + ", " + QString::number(mMineGrid.at(0)->size().height())
+            + " | idx :" + QString::number(idx);
     mStatusBar->showMessage(message);
 
     // Event weitergeben -> unnötig?
-    QWidget::resizeEvent(event);
+    return QWidget::resizeEvent(event);
 }

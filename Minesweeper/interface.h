@@ -8,6 +8,7 @@
 #include "game.h"
 #include "mine_counter.h"
 #include "timer.h"
+#include "aspect_ratio_widget.h"
 
 class Interface : public QWidget
 {

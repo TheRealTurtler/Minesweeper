@@ -27,6 +27,7 @@ public:
     void checkNearbyMines(const unsigned int column, const unsigned int row);
     void checkNearbyMines(const unsigned int index);
     void searchField(MineField* mineField);
+    QPoint getFieldPosition(unsigned int index);
 
     // Get und Set Funktionen
     unsigned int minesPlaced() const;
@@ -61,7 +62,8 @@ private:
     bool mFirstClick = true;
     bool mGameOver = false;
 
-    QSize mMineFieldSize;               // Größe eines Mienenfeldes
+    QSize mMineFieldSize = QSize(48, 48);                   // Größe eines Mienenfeldes
+    const QSize mMineFieldMinimumSize = QSize(16, 16);;      // Mindestgröße eines Mienenfeldes
 
     // RNG
     std::mt19937 mRandomEngine;

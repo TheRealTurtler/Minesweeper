@@ -2,14 +2,22 @@
 
 Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), mStatusBar(statusBar)
 {
-    auto layoutH = new QHBoxLayout;
-    auto layoutV1 = new QVBoxLayout(this);
-    auto layoutV2 = new QVBoxLayout;
+    auto layoutH = new QHBoxLayout(this);
+    //auto layoutV1 = new QVBoxLayout(this);
+    auto layoutV = new QVBoxLayout;
 
     // Spiel erstellen
-    auto game = new Game(9, 9, 10, this);           // Einfach 9x9 mit 10 Mienen
+    unsigned int columns = 9;
+    unsigned int rows = 9;
+    unsigned int mines = 10;
+
+    auto game = new Game(columns, rows, mines);
+
+    //auto game = new Game(9, 9, 10, this);           // Einfach 9x9 mit 10 Mienen
     //auto game = new Game(16, 16, 40, this);           // Fortgeschritten 16x16 mit 40 Mienen
     //auto game = new Game(30, 16, 99, this);         // Experte 30x16 mit 99 Mienen
+
+    auto aspectRatio = new AspectRatioWidget(game, columns, rows, this);
 
     auto timer = new Timer(this);
 
@@ -21,11 +29,14 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     connect(game, &Game::flagRemoved, mineCounter, &MineCounter::displayRemainingMines);
 
 
+    aspectRatio->setAutoFillBackground(true);
+    aspectRatio->setPalette(QPalette(QPalette::Background, Qt::red));
+
     game->setAutoFillBackground(true);
     game->setPalette(QPalette(QPalette::Background, Qt::green));
     /*
     timer->setAutoFillBackground(true);
-    timer->setPalette(QPalette(QPalette::Background, Qt::red));
+    timer->setPalette(QPalette(QPalette::Background, Qt::yellow));
 
     mineCounter->setAutoFillBackground(true);
     mineCounter->setPalette(QPalette(QPalette::Background, Qt::blue));
@@ -35,26 +46,26 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
 
     game->mStatusBar = mStatusBar;
 
-    game->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //game->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    layoutV2->addStretch(1);
-    layoutV2->addWidget(timer);
-    layoutV2->addStretch(1);
-    layoutV2->addWidget(mineCounter);
-    layoutV2->addStretch(1);
+    layoutV->addStretch(1);
+    layoutV->addWidget(timer);
+    layoutV->addStretch(1);
+    layoutV->addWidget(mineCounter);
+    layoutV->addStretch(1);
 
     //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    layoutH->addStretch(1);
+    //layoutH->addStretch(1);
     //layoutH->addWidget(game, 0, Qt::AlignCenter);
-    layoutH->addWidget(game, 0);
-    layoutH->addLayout(layoutV2);
-    layoutH->addStretch(1);
+    layoutH->addWidget(aspectRatio, 1);
+    layoutH->addLayout(layoutV);
+    //layoutH->addStretch(1);
     //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
     //layoutV1->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    layoutV1->addStretch(1);
-    layoutV1->addLayout(layoutH, 0);
-    layoutV1->addStretch(1);
+    //layoutV1->addStretch(1);
+    //layoutV1->addLayout(layoutH, 0);
+    //layoutV1->addStretch(1);
     //layoutV1->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
 
     // Layout anwenden -> bereits bei initialisierung geschehen
