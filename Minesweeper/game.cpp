@@ -338,7 +338,7 @@ void Game::searchField(MineField *mineField)
         // Alle Mienen gefunden
         for(const auto& i : mExplosiveFields)
         {
-            i->setImage(QPixmap(":/resources/mine.png"));
+            i->setImage(QPixmap(":/resources/field.png") ,QPixmap(":/resources/mine.png"));
         }
 
         // Signal für Spiel gewonnen ausgeben
@@ -356,7 +356,7 @@ void Game::searchField(MineField *mineField)
         // Alle Mienen explodieren
         for(const auto& i : mExplosiveFields)
         {
-            i->setImage(QPixmap(":/resources/mine_exploded.png"));
+            i->setImage(QPixmap(":/resources/field.png"), QPixmap(":/resources/mine_exploded.png"));
         }
 
         // Signal für Spiel verloren ausgeben
@@ -517,7 +517,7 @@ void Game::resizeEvent(QResizeEvent *event)
         i->move(getFieldPosition(idx));
         i->resize(mMineFieldSize);
 
-        i->setPixmap(i->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        //i->setPixmap(i->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
         //i->setGeometry(idx % mColumns, idx / mColumns, fieldSize, fieldSize);
 

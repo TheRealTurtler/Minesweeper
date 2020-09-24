@@ -1,5 +1,7 @@
 #include "mine_field.h"
 
+#include <QPainter>
+
 MineField::MineField(QWidget *parent) : QLabel(parent)
 {
     setFlagState(NONE);
@@ -34,28 +36,28 @@ void MineField::setCleared(bool cleared)
         setImage(QPixmap(":/resources/empty.png"));
         break;
     case 1:
-        setImage(QPixmap(":/resources/nearby1.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby1.png"));
         break;
     case 2:
-        setImage(QPixmap(":/resources/nearby2.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby2.png"));
         break;
     case 3:
-        setImage(QPixmap(":/resources/nearby3.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby3.png"));
         break;
     case 4:
-        setImage(QPixmap(":/resources/nearby4.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby4.png"));
         break;
     case 5:
-        setImage(QPixmap(":/resources/nearby5.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby5.png"));
         break;
     case 6:
-        setImage(QPixmap(":/resources/nearby6.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby6.png"));
         break;
     case 7:
-        setImage(QPixmap(":/resources/nearby7.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby7.png"));
         break;
     case 8:
-        setPixmap(QPixmap(":/resources/nearby8.png"));
+        setImage(QPixmap(":/resources/empty.png"), QPixmap(":/resources/nearby8.png"));
         break;
     default:
         break;
@@ -83,9 +85,22 @@ QPixmap MineField::pixmap()
 // Bild für dieses Feld festlegen
 void MineField::setImage(const QPixmap &pixmap)
 {
-    this->setPixmap(pixmap.scaled(this->sizeHint(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    setPixmap(pixmap.scaled(sizeHint(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     mPixmap = pixmap;
+}
+
+void MineField::setImage(const QPixmap &basePixmap, const QPixmap &overlayPixmap)
+{
+    //QPixmap* pixmap = new QPixmap(basePixmap);
+    QPainter* painter = new QPainter(&mPixmap);
+
+    painter->drawPixmap(0, 0, basePixmap);
+    painter->drawPixmap(0, 0, overlayPixmap);
+
+    setPixmap(mPixmap.scaled(sizeHint(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    delete painter;
 }
 
 // Überprüfe den Flaggenstatus dieses Feldes
@@ -105,10 +120,10 @@ void MineField::setFlagState(MineField::FlagState flagState)
         setImage(QPixmap(":/resources/field.png"));
         break;
     case FLAGGED:
-        setImage(QPixmap(":/resources/flag.png"));
+        setImage(QPixmap(":/resources/field.png"), QPixmap(":/resources/flag.png"));
         break;
     case UNKNOWN:
-        setImage(QPixmap(":/resources/unknown.png"));
+        setImage(QPixmap(":/resources/field.png"), QPixmap(":/resources/unknown.png"));
         break;
     default:
         break;
@@ -140,7 +155,7 @@ void MineField::mousePressEvent(QMouseEvent* event)
 // EVENT | Fenstergröße geändert -> wahrscheinlich hier unnötig
 void MineField::resizeEvent(QResizeEvent *event)
 {
-    //this->setPixmap(mPixmap.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    this->setPixmap(mPixmap.scaled(size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
     return QLabel::resizeEvent(event);
 }

@@ -23,18 +23,22 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
 
     auto mineCounter = new MineCounter(this);
 
+    auto icon = new QLabel(this);
+
+    icon->setPixmap(QPixmap(":/resources/mine.png"));
+
     connect(game, &Game::gameStarted, timer, &Timer::startTimer);
     connect(game, &Game::gameFinished, timer, &Timer::stopTimer);
     connect(game, &Game::flagAdded, mineCounter, &MineCounter::displayRemainingMines);
     connect(game, &Game::flagRemoved, mineCounter, &MineCounter::displayRemainingMines);
 
-
+    /*
     aspectRatio->setAutoFillBackground(true);
     aspectRatio->setPalette(QPalette(QPalette::Background, Qt::red));
 
     game->setAutoFillBackground(true);
     game->setPalette(QPalette(QPalette::Background, Qt::green));
-    /*
+
     timer->setAutoFillBackground(true);
     timer->setPalette(QPalette(QPalette::Background, Qt::yellow));
 
@@ -50,8 +54,9 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
 
     layoutV->addStretch(1);
     layoutV->addWidget(timer);
-    layoutV->addStretch(1);
     layoutV->addWidget(mineCounter);
+    layoutV->addStretch(1);
+    layoutV->addWidget(icon, 0, Qt::AlignCenter);
     layoutV->addStretch(1);
 
     //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));

@@ -28,6 +28,7 @@ public:
     void setMinesNearby(unsigned short minesNearby);
     QPixmap pixmap();
     void setImage(const QPixmap& pixmap);
+    void setImage(const QPixmap& basePixmap, const QPixmap& overlayPixmap);
     FlagState flagState();
     void setFlagState(FlagState flagState);
 
