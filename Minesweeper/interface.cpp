@@ -7,28 +7,22 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     auto layoutV = new QVBoxLayout;
 
     // Spiel erstellen
-    unsigned int columns = 9;
-    unsigned int rows = 9;
-    unsigned int mines = 10;
+    mGame = new Game(9, 9, 10, this);           // Einfach 9x9 mit 10 Mienen
+    //mGame = new Game(16, 16, 40, this);           // Fortgeschritten 16x16 mit 40 Mienen
+    //mGame = new Game(30, 16, 99, this);         // Experte 30x16 mit 99 Mienen
 
-    mGame = new Game(columns, rows, mines);
+    mAspectRatio = new AspectRatioWidget(mGame, mGame->columns(), mGame->rows(), this);
 
-    //auto game = new Game(9, 9, 10, this);           // Einfach 9x9 mit 10 Mienen
-    //auto game = new Game(16, 16, 40, this);           // Fortgeschritten 16x16 mit 40 Mienen
-    //auto game = new Game(30, 16, 99, this);         // Experte 30x16 mit 99 Mienen
+    mTimer = new Timer(this);
 
-    auto aspectRatio = new AspectRatioWidget(mGame, columns, rows, this);
-
-    auto timer = new Timer(this);
-
-    auto mineCounter = new MineCounter(this);
+    mMineCounter = new MineCounter(this);
 
     auto icon = new Icon(this);
 
-    connect(mGame, &Game::gameStarted, timer, &Timer::startTimer);
-    connect(mGame, &Game::gameFinished, timer, &Timer::stopTimer);
-    connect(mGame, &Game::flagAdded, mineCounter, &MineCounter::displayRemainingMines);
-    connect(mGame, &Game::flagRemoved, mineCounter, &MineCounter::displayRemainingMines);
+    connect(mGame, &Game::gameStarted, mTimer, &Timer::startTimer);
+    connect(mGame, &Game::gameFinished, mTimer, &Timer::stopTimer);
+    connect(mGame, &Game::flagAdded, mMineCounter, &MineCounter::displayRemainingMines);
+    connect(mGame, &Game::flagRemoved, mMineCounter, &MineCounter::displayRemainingMines);
     connect(mGame, &Game::cheated, this, &Interface::cheatDetected);
     connect(mGame, &Game::gameFinished, this, &Interface::gameFinished);
 
@@ -46,19 +40,35 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     mineCounter->setPalette(QPalette(QPalette::Background, Qt::blue));
     */
 
-    mineCounter->displayRemainingMines(mGame->minesPlaced());
+    mMineCounter->displayRemainingMines(mGame->minesPlaced());
 
     //mGame->mStatusBar = mStatusBar;
 
     layoutV->addStretch(1);
-    layoutV->addWidget(timer);
-    layoutV->addWidget(mineCounter);
+    layoutV->addWidget(mTimer);
+    layoutV->addWidget(mMineCounter);
     layoutV->addStretch(1);
     layoutV->addWidget(icon);
     layoutV->addStretch(1);
 
-    layoutH->addWidget(aspectRatio, 1);
+    layoutH->addWidget(mAspectRatio, 1);
     layoutH->addLayout(layoutV);
+}
+
+void Interface::newGame(const unsigned int columns, const unsigned int rows, const unsigned int mines)
+{
+    mHighscoreQualified = true;
+
+    // Timer zurücksetzen
+    mTimer->resetTimer();
+
+    // Verbleibende Mienenanzahl zurücksetzen
+    mMineCounter->displayRemainingMines(mines);
+
+    // Spiel starten
+    mGame->startGame(columns, rows, mines);
+
+    mAspectRatio->setAspectRatio(columns, rows);
 }
 
 // Cheat verwendet

@@ -137,14 +137,14 @@ void MineField::mousePressEvent(QMouseEvent* event)
 {
     const auto& button = event->button();
 
-    if(button == Qt::LeftButton)
+    if(button == Qt::LeftButton && !mCleared)
     {
         emit leftClicked();
 
         return;
     }
 
-    if(button == Qt::RightButton)
+    if(button == Qt::RightButton && !mCleared)
     {
         emit rightClicked();
 

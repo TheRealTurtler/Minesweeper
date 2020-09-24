@@ -79,6 +79,12 @@ void MainWindow::createMenus()
 void MainWindow::newGame()
 {
     // TODO
+
+    unsigned int columns = 30;
+    unsigned int rows = 16;
+    unsigned int mines = 99;
+
+    mInterface->newGame(columns, rows, mines);
 }
 
 // Programm beenden
@@ -90,8 +96,6 @@ void MainWindow::exit()
 // nächstes angeklicktes Feld auf Mienen untersuchen
 void MainWindow::searchField()
 {
-    // TODO
-
     mInterface->game()->setMetaldetector(true);
 }
 

@@ -1,53 +1,80 @@
 #include "game.h"
 
 // Constructor
-Game::Game(const unsigned int columns, const unsigned int rows, const unsigned int mines, QWidget *parent)
-    : QWidget(parent), mColumns(columns), mRows(rows), mMines(mines)
+Game::Game(QWidget *parent) : QWidget(parent)
 {
+    // RNG Initialisierung
+    std::random_device randomDevice;
+    mRandomEngine = std::mt19937(randomDevice());
+}
+
+Game::Game(const unsigned int columns, const unsigned int rows, const unsigned int mines, QWidget *parent)
+    : QWidget(parent)
+{
+    // RNG Initialisierung
+    std::random_device randomDevice;
+    mRandomEngine = std::mt19937(randomDevice());
+
+    startGame(columns, rows, mines);
+}
+
+// Spielfeld initialisieren
+void Game::startGame(const unsigned int columns, const unsigned int rows, const unsigned int mines)
+{
+    // Variablen definieren
+    mFlags = 0;
+
+    mFirstClick = true;
+    mGameOver = false;
+    mMetalDetector = false;
+
+    // Anzahl Spalten, Zeilen und verteilter Mienen festlegen
+    mColumns = columns;
+    mRows = rows;
+    mMines = mines;
+
+    // Spielfeld leeren
+    clearGame();
+
     // Vectorgröße anpassen
     mMineGrid.resize(mRows * mColumns);
     mMineGrid.shrink_to_fit();
 
     // Spielfeld erstellen
-    for(auto r = decltype (rows) {0}; r < mRows; ++r)
+    for(decltype (mRows) row = 0; row < mRows; ++row)
     {
-        for(auto c = decltype (rows) {0}; c < mColumns; ++c)
+        for(decltype (mColumns) column = 0; column < mColumns; ++column)
         {
             MineField* mineField = new MineField(this);
 
             mineField->setMinimumSize(mMineFieldMinimumSize);
-            //mineField->setScaledContents(true);
-            //mineField->setPixmap(mineField->pixmap().scaled(mMineFieldSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            //mineField->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-            //gameLayout->addWidget(mineField, r, c);
-
-            mineField->setGeometry(c * (mMineFieldSize.width() + mSpace), r * (mMineFieldSize.height() + mSpace), mMineFieldSize.width(), mMineFieldSize.height());
+            mineField->setGeometry(column * (mMineFieldSize.width() + mSpace), row * (mMineFieldSize.height() + mSpace), mMineFieldSize.width(), mMineFieldSize.height());
 
             connect(mineField, &MineField::leftClicked, this, &Game::slotSearchField);
             connect(mineField, &MineField::rightClicked, this, &Game::slotFlagMine);
 
-            mMineGrid.at(c + r * mColumns) = mineField;
+            mMineGrid.at(column + row * mColumns) = mineField;
+
+            mineField->show();
         }
     }
 
+    // Minimale Spielfeldgröße festlegen
     setMinimumSize(mColumns * mMineFieldMinimumSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldMinimumSize.height() + (mRows - 1) * mSpace);
 
-    // RNG Initialisierung
-    std::random_device randomDevice;
-    mRandomEngine = std::mt19937(randomDevice());
+    // RNG
     mDistribution = std::uniform_int_distribution<size_t>(0, mMineGrid.size() - 1);
 }
 
-// Destructor
-Game::~Game()
+// Mienenfelder löschen
+void Game::clearGame()
 {
-    /*
+    // Spielfeld leeren
     for(auto i : mMineGrid)
     {
         delete i;
     }
-    */
 }
 
 // Zufällig Mienen auf dem Spielfeld verteilen
@@ -58,6 +85,10 @@ void Game::spreadMines(const unsigned int amount)
     {
         return;
     }
+
+    // Vectorgröße der Felder mit Mienen anpassen
+    mExplosiveFields.resize(amount);
+    mExplosiveFields.shrink_to_fit();
 
     // Mienen zufällig verteilen
     for(auto i = decltype (amount) {0}; i < amount; ++i)    // auto i = ... weil amount const ist
@@ -70,7 +101,11 @@ void Game::spreadMines(const unsigned int amount)
             randPos = mDistribution(mRandomEngine);
         }
 
+        // Miene auf Feld setzen
         mMineGrid.at(randPos)->setMine(true);
+
+        // Felder mit Mienen in extra vector speichern
+        mExplosiveFields.at(i) = mMineGrid.at(randPos);
     }
 }
 
@@ -361,7 +396,7 @@ void Game::detectMine(MineField *mineField)
     }
 
     // Metalldetektor wieder ausschalten
-    mMetalDetector = false;
+    setMetaldetector(false);
 }
 
 // Position des Mienenfeldes mit Index index ermitteln
@@ -373,6 +408,16 @@ QPoint Game::getFieldPosition(unsigned int index)
     pos->setY((index / mColumns) * (mMineFieldSize.height() + mSpace));     // int division so gedacht
 
     return *pos;
+}
+
+unsigned int Game::columns() const
+{
+    return mColumns;
+}
+
+unsigned int Game::rows() const
+{
+    return mRows;
 }
 
 // Anzahl platzierter Mienen zurückgeben
@@ -390,7 +435,25 @@ bool Game::metalDetector() const
 // Metalldetektorstatus setzen (Cheat / Tipp um nach Mienen zu suchen)
 void Game::setMetaldetector(bool metalDetector)
 {
+    // Return, wenn mMetalDetector bereits den Wert von metalDetector hat
+    if(mMetalDetector == metalDetector)
+    {
+        return;
+    }
+
     mMetalDetector = metalDetector;
+
+    // Cursor ändern
+    if(mMetalDetector)
+    {
+        QCursor cursor(QPixmap(":/resources/metal_detector.png"), 0, 0);
+
+        setCursor(cursor);
+    }
+    else
+    {
+        unsetCursor();
+    }
 }
 
 // SLOT | Angeklicktes Feld aufdecken
@@ -448,16 +511,6 @@ void Game::slotSearchField()
         {
             it->setMine(false);
         }
-
-        // Felder mit Mienen in extra vector speichern
-        for(const auto& i : mMineGrid)
-        {
-            if(i->isMine())
-            {
-                mExplosiveFields.push_back(i);
-            }
-        }
-        mExplosiveFields.shrink_to_fit();
 
         // Anzahl benachbarter Minen ermitteln (für jedes Feld)
         for(unsigned int i = 0; i < mMineGrid.size(); ++i)
@@ -579,4 +632,20 @@ void Game::resizeEvent(QResizeEvent *event)
 
     // Event weitergeben
     return QWidget::resizeEvent(event);
+}
+
+// EVENT | Maustaste gedrückt
+void Game::mousePressEvent(QMouseEvent *event)
+{
+    const auto& button = event->button();
+
+    // Metalldetektor zurücksetzen, wenn kein Mienenfeld angeklickt wurde
+    if(button == Qt::LeftButton || button == Qt::RightButton)
+    {
+        setMetaldetector(false);
+
+        return;
+    }
+
+    return QWidget::mousePressEvent(event);
 }

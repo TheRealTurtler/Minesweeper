@@ -14,5 +14,6 @@
         <file>resources/nearby8.png</file>
         <file>resources/mine_exploded.png</file>
         <file>resources/unknown.png</file>
+        <file>resources/metal_detector.png</file>
     </qresource>
 </RCC>

@@ -23,6 +23,16 @@ AspectRatioWidget::AspectRatioWidget(QWidget *widget, float width, float height,
 
 }
 
+void AspectRatioWidget::setAspectRatio(float aspectRatio)
+{
+    mAspectRatio = aspectRatio;
+}
+
+void AspectRatioWidget::setAspectRatio(float width, float height)
+{
+    mAspectRatio = width / height;
+}
+
 void AspectRatioWidget::resizeEvent(QResizeEvent *event)
 {
     // Überprüfen, ob sich Größe wirklich geändert hat

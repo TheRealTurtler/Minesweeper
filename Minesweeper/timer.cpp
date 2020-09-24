@@ -42,3 +42,13 @@ void Timer::addSecond()
 
     mTimerLabel->setText(text);
 }
+
+void Timer::resetTimer()
+{
+    stopTimer();
+
+    mSeconds = 0;
+    mMinutes = 0;
+
+    mTimerLabel->setText("00:00");
+}

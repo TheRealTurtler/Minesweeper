@@ -13,6 +13,7 @@ public:
     explicit Timer(QWidget *parent = nullptr);
 
     void addSecond();   // -> private?
+    void resetTimer();
 
 public slots:
     void startTimer();

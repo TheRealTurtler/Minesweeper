@@ -14,13 +14,17 @@ public:
     explicit AspectRatioWidget(QWidget* widget, float aspectRatio, QWidget *parent = nullptr);
     explicit AspectRatioWidget(QWidget* widget, float width, float height, QWidget *parent = nullptr);
 
+    // Get und Set Funktionen
+    void setAspectRatio(float aspectRatio);
+    void setAspectRatio(float width, float height);
+
 signals:
 
 protected:
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    const float mAspectRatio = 1;
+    float mAspectRatio = 1;
 
     QBoxLayout* mLayout = nullptr;
 };
