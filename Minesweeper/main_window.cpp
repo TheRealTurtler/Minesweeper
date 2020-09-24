@@ -6,7 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
-    mInterface = new Interface(this, statusBar());
+    mInterface = new Interface(this);
+    mInterface->setStatusBar(statusBar());
 
     mNewGameSelection = new NewGameSelection(this);
 

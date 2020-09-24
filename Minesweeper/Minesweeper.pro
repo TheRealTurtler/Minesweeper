@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
 aspect_ratio_widget.cpp \
+	clickable_label.cpp \
 	game.cpp \
 	icon.cpp \
 	interface.cpp \
@@ -22,6 +23,7 @@ aspect_ratio_widget.cpp \
 
 HEADERS += \
 aspect_ratio_widget.h \
+	clickable_label.h \
 	game.h \
 	icon.h \
 	interface.h \

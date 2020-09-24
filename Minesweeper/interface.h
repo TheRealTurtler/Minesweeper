@@ -17,14 +17,14 @@ class Interface : public QWidget
     Q_OBJECT
 
 public:
-    explicit Interface(QWidget *parent = nullptr, QStatusBar* statusBar = nullptr);
+    explicit Interface(QWidget *parent = nullptr);
 
     void newGame(const unsigned int columns, const unsigned int rows, const unsigned int mines);
 
     // Get und Set Funktionen
     Game* game() const;
+    void setStatusBar(QStatusBar* statusBar);
 
-    QStatusBar* mStatusBar = nullptr;
 
 public slots:
     void cheatDetected();
@@ -37,6 +37,8 @@ private:
     AspectRatioWidget* mAspectRatio;
     Timer* mTimer;
     MineCounter* mMineCounter;
+
+    QStatusBar* mStatusBar = nullptr;
 
     bool mHighscoreQualified = true;
 };

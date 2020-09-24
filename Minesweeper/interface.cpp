@@ -1,7 +1,7 @@
 #include "interface.h"
 
 // Constructor
-Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), mStatusBar(statusBar)
+Interface::Interface(QWidget *parent) : QWidget(parent)
 {
     auto layoutH = new QHBoxLayout(this);
     auto layoutV = new QVBoxLayout;
@@ -96,4 +96,10 @@ void Interface::gameFinished(bool win)
 Game *Interface::game() const
 {
     return mGame;
+}
+
+// StatusBar setzen
+void Interface::setStatusBar(QStatusBar *statusBar)
+{
+    mStatusBar = statusBar;
 }

@@ -3,14 +3,18 @@
 
 #include <QDialog>
 #include <QGridLayout>
-#include <QPushButton>
+//#include <QPushButton>
+#include <QVBoxLayout>
+
+#include "clickable_label.h"
+#include "aspect_ratio_widget.h"
 
 class NewGameSelection : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit NewGameSelection(QWidget* parent);
+    explicit NewGameSelection(QWidget* parent = nullptr);
 
     // Get und Set Funktionen
     unsigned int columns() const;
@@ -31,6 +35,11 @@ private:
     unsigned int mColumns = 0;
     unsigned int mRows = 0;
     unsigned int mMines = 0;
+
+    ClickableLabel* mEasy;
+    ClickableLabel* mAdvanced;
+    ClickableLabel* mExpert;
+    ClickableLabel* mCustom;
 };
 
 #endif // NEW_GAME_SELECTION_H

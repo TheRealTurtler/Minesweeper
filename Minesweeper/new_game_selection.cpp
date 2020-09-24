@@ -6,32 +6,71 @@ NewGameSelection::NewGameSelection(QWidget* parent) : QDialog(parent)
     // Hilfe-Fragezeichen in der Fensterleiste ausschalten
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 
+    auto selection = new QWidget();
+
     // Layout initialisieren
-    auto layout = new QGridLayout(this);
+    auto layoutSelection = new QGridLayout(selection);
+    auto layout = new QVBoxLayout(this);
+
+    layoutSelection->setContentsMargins(0,0,0,0);
 
     // Buttons initialisieren
-    auto buttonEasy = new QPushButton("Einfach: 9x9", this);
-    auto buttonAdvanced = new QPushButton("Fortgeschritten: 16x16", this);
-    auto buttonExpert = new QPushButton("Experte: 30x16", this);
-    auto buttonCustom = new QPushButton("Benutzerdefiniert: #x#", this);
+    /*
+    auto easy = new QPushButton("Einfach: 9x9", this);
+    auto advanced = new QPushButton("Fortgeschritten: 16x16", this);
+    auto expert = new QPushButton("Experte: 30x16", this);
+    auto custom = new QPushButton("Benutzerdefiniert: #x#", this);
+    */
+
+
+
+    mEasy = new ClickableLabel(selection);
+    mAdvanced = new ClickableLabel(selection);
+    mExpert = new ClickableLabel(selection);
+    mCustom = new ClickableLabel(selection);
+
+    mEasy->setMinimumSize(64, 64);
+    mAdvanced->setMinimumSize(64, 64);
+    mExpert->setMinimumSize(64, 64);
+    mCustom->setMinimumSize(64, 64);
+
+    mEasy->setImage(QPixmap(":resources/easy.png"));
+    mAdvanced->setImage(QPixmap(":resources/advanced.png"));
+    mExpert->setImage(QPixmap(":resources/expert.png"));
+    mCustom->setImage(QPixmap(":resources/custom.png"));
+
+    //mEasy->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //mAdvanced->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Minimale größe festlegen, es wird ansonsten eine Warnung ausgegeben
-    setMinimumSize(200, 200);
+    //setMinimumSize(200, 200);
 
     // Buttons zu Layout hinzufügen
-    layout->addWidget(buttonEasy, 0, 0);
-    layout->addWidget(buttonAdvanced, 0, 1);
-    layout->addWidget(buttonExpert, 1, 0);
-    layout->addWidget(buttonCustom, 1, 1);
+    layoutSelection->addWidget(mEasy, 0, 0);
+    layoutSelection->addWidget(mAdvanced, 0, 1);
+    layoutSelection->addWidget(mExpert, 1, 0);
+    layoutSelection->addWidget(mCustom, 1, 1);
 
     // Signale und Slots verbinden
-    connect(buttonEasy, &QPushButton::clicked, this, &NewGameSelection::selectEasy);
-    connect(buttonAdvanced, &QPushButton::clicked, this, &NewGameSelection::selectAdvanced);
-    connect(buttonExpert, &QPushButton::clicked, this, &NewGameSelection::selectExpert);
-    connect(buttonCustom, &QPushButton::clicked, this, &NewGameSelection::selectCustom);
+    connect(mEasy, &ClickableLabel::clicked, this, &NewGameSelection::selectEasy);
+    connect(mAdvanced, &ClickableLabel::clicked, this, &NewGameSelection::selectAdvanced);
+    connect(mExpert, &ClickableLabel::clicked, this, &NewGameSelection::selectExpert);
+    connect(mCustom, &ClickableLabel::clicked, this, &NewGameSelection::selectCustom);
 
     // Button für benutzerdefinierte Größe deaktivieren -> TODO
-    buttonCustom->setEnabled(false);
+    //custom->setEnabled(false);
+
+    auto aspectRatio = new AspectRatioWidget(selection, 2, 2, this);
+
+    layout->addWidget(aspectRatio);
+
+    /*
+    aspectRatio->setAutoFillBackground(true);
+    aspectRatio->setPalette(QPalette(QPalette::Background, Qt::red));
+
+    selection->setAutoFillBackground(true);
+    selection->setPalette(QPalette(QPalette::Background, Qt::green));
+    */
 }
 
 // Spaltenanzahl zurückgeben
@@ -87,3 +126,5 @@ void NewGameSelection::selectCustom()
 {
 
 }
+
+

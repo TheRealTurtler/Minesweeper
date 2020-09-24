@@ -8,7 +8,11 @@ AspectRatioWidget::AspectRatioWidget(QWidget *widget, float aspectRatio, QWidget
     // Falls nicht schon der Fall wird dieses Widget als parent vom angegebenen Widget gesetzt
     widget->setParent(this);
 
+    // Layout initialisieren
     mLayout = new QBoxLayout(QBoxLayout::LeftToRight, this);
+
+    // Rand des Layouts entfernen
+    mLayout->setContentsMargins(0, 0, 0, 0);
 
     //mLayout->addItem(new QSpacerItem(0, 0));
     mLayout->addStretch();

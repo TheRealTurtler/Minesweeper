@@ -2,7 +2,7 @@
 
 #include <QPainter>
 
-MineField::MineField(QWidget *parent) : QLabel(parent)
+MineField::MineField(QWidget *parent) : ClickableLabel(parent)
 {
     setFlagState(NONE);
 }
@@ -76,33 +76,6 @@ void MineField::setMinesNearby(unsigned short minesNearby)
     mMinesNearby = minesNearby;
 }
 
-// Bild dieses Feldes abfragen
-QPixmap MineField::pixmap()
-{
-    return mPixmap;
-}
-
-// Bild für dieses Feld festlegen
-void MineField::setImage(const QPixmap &pixmap)
-{
-    setPixmap(pixmap.scaled(sizeHint(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-    mPixmap = pixmap;
-}
-
-void MineField::setImage(const QPixmap &basePixmap, const QPixmap &overlayPixmap)
-{
-    //QPixmap* pixmap = new QPixmap(basePixmap);
-    QPainter* painter = new QPainter(&mPixmap);
-
-    painter->drawPixmap(0, 0, basePixmap);
-    painter->drawPixmap(0, 0, overlayPixmap);
-
-    setPixmap(mPixmap.scaled(sizeHint(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-    delete painter;
-}
-
 // Überprüfe den Flaggenstatus dieses Feldes
 MineField::FlagState MineField::flagState()
 {
@@ -153,7 +126,7 @@ void MineField::mousePressEvent(QMouseEvent* event)
 
     return QWidget::mousePressEvent(event);
 }
-
+/*
 // EVENT | Fenstergröße geändert -> wahrscheinlich hier unnötig
 void MineField::resizeEvent(QResizeEvent *event)
 {
@@ -161,11 +134,12 @@ void MineField::resizeEvent(QResizeEvent *event)
     if(event->oldSize() != size())
     {
         // Größe ändern
-        setPixmap(mPixmap.scaled(size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        setPixmap(originalPixmap().scaled(size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
         return;
     }
 
     // Event weitergeben
-    return QLabel::resizeEvent(event);
+    return ClickableLabel::resizeEvent(event);
 }
+*/
