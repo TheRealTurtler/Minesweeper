@@ -125,6 +125,8 @@ void MineField::setFlagState(MineField::FlagState flagState)
     case UNKNOWN:
         setImage(QPixmap(":/resources/field.png"), QPixmap(":/resources/unknown.png"));
         break;
+    case DETECTED:
+        setImage(QPixmap(":/resources/field.png"), QPixmap(":/resources/mine.png"));
     default:
         break;
     }

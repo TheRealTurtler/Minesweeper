@@ -28,13 +28,16 @@ public:
     void checkNearbyMines(const unsigned int column, const unsigned int row);
     void checkNearbyMines(const unsigned int index);
     void searchField(MineField* mineField);
+    void detectMine(MineField* mineField);
     QPoint getFieldPosition(unsigned int index);
 
     // Get und Set Funktionen
     unsigned int minesPlaced() const;
+    bool metalDetector() const;
+    void setMetaldetector(bool metalDetector);
 
     // DEBUG
-    QStatusBar* mStatusBar = nullptr;
+    //QStatusBar* mStatusBar = nullptr;
 
 public slots:
     void slotSearchField();
@@ -45,6 +48,8 @@ signals:
     void gameFinished(bool win);
     void flagAdded(int remainingMines);
     void flagRemoved(int remainingMines);
+    void mineDetected(bool mineDetected);
+    void cheated();
 
 protected:
    virtual void resizeEvent(QResizeEvent* event) override;
@@ -62,6 +67,7 @@ private:
 
     bool mFirstClick = true;
     bool mGameOver = false;
+    bool mMetalDetector = false;
 
     const QSize mMineFieldMinimumSize = QSize(32, 32);;      // Mindestgröße eines Mienenfeldes
     QSize mMineFieldSize = mMineFieldMinimumSize;                   // Größe eines Mienenfeldes

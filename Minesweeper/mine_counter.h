@@ -1,5 +1,5 @@
-#ifndef MINECOUNTER_H
-#define MINECOUNTER_H
+#ifndef MINE_COUNTER_H
+#define MINE_COUNTER_H
 
 #include <QWidget>
 #include <QBoxLayout>

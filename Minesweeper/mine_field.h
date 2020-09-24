@@ -1,5 +1,5 @@
-#ifndef MINEFIELD_H
-#define MINEFIELD_H
+#ifndef MINE_FIELD_H
+#define MINE_FIELD_H
 
 #include <QLabel>
 #include <QPixmap>
@@ -17,7 +17,8 @@ public:
     {
         NONE,
         FLAGGED,
-        UNKNOWN
+        UNKNOWN,
+        DETECTED
     };
 
     // Get und Set Funktionen

@@ -17,11 +17,21 @@ class Interface : public QWidget
 public:
     explicit Interface(QWidget *parent = nullptr, QStatusBar* statusBar = nullptr);
 
-    // DEBUG
+    // Get und Set Funktionen
+    Game* game() const;
+
     QStatusBar* mStatusBar = nullptr;
+
+public slots:
+    void cheatDetected();
+    void gameFinished(bool win);
 
 signals:
 
+private:
+    Game* mGame;
+
+    bool mHighscoreQualified = true;
 };
 
 #endif // INTERFACE_H

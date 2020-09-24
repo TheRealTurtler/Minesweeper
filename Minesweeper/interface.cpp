@@ -1,23 +1,23 @@
 #include "interface.h"
 
+// Constructor
 Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), mStatusBar(statusBar)
 {
     auto layoutH = new QHBoxLayout(this);
-    //auto layoutV1 = new QVBoxLayout(this);
     auto layoutV = new QVBoxLayout;
 
     // Spiel erstellen
-    unsigned int columns = 16;
-    unsigned int rows = 16;
-    unsigned int mines = 40;
+    unsigned int columns = 9;
+    unsigned int rows = 9;
+    unsigned int mines = 10;
 
-    auto game = new Game(columns, rows, mines);
+    mGame = new Game(columns, rows, mines);
 
     //auto game = new Game(9, 9, 10, this);           // Einfach 9x9 mit 10 Mienen
     //auto game = new Game(16, 16, 40, this);           // Fortgeschritten 16x16 mit 40 Mienen
     //auto game = new Game(30, 16, 99, this);         // Experte 30x16 mit 99 Mienen
 
-    auto aspectRatio = new AspectRatioWidget(game, columns, rows, this);
+    auto aspectRatio = new AspectRatioWidget(mGame, columns, rows, this);
 
     auto timer = new Timer(this);
 
@@ -25,10 +25,12 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
 
     auto icon = new Icon(this);
 
-    connect(game, &Game::gameStarted, timer, &Timer::startTimer);
-    connect(game, &Game::gameFinished, timer, &Timer::stopTimer);
-    connect(game, &Game::flagAdded, mineCounter, &MineCounter::displayRemainingMines);
-    connect(game, &Game::flagRemoved, mineCounter, &MineCounter::displayRemainingMines);
+    connect(mGame, &Game::gameStarted, timer, &Timer::startTimer);
+    connect(mGame, &Game::gameFinished, timer, &Timer::stopTimer);
+    connect(mGame, &Game::flagAdded, mineCounter, &MineCounter::displayRemainingMines);
+    connect(mGame, &Game::flagRemoved, mineCounter, &MineCounter::displayRemainingMines);
+    connect(mGame, &Game::cheated, this, &Interface::cheatDetected);
+    connect(mGame, &Game::gameFinished, this, &Interface::gameFinished);
 
     /*
     aspectRatio->setAutoFillBackground(true);
@@ -44,11 +46,9 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     mineCounter->setPalette(QPalette(QPalette::Background, Qt::blue));
     */
 
-    mineCounter->displayRemainingMines(game->minesPlaced());
+    mineCounter->displayRemainingMines(mGame->minesPlaced());
 
-    game->mStatusBar = mStatusBar;
-
-    //game->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //mGame->mStatusBar = mStatusBar;
 
     layoutV->addStretch(1);
     layoutV->addWidget(timer);
@@ -57,22 +57,33 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     layoutV->addWidget(icon);
     layoutV->addStretch(1);
 
-    //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    //layoutH->addStretch(1);
-    //layoutH->addWidget(game, 0, Qt::AlignCenter);
     layoutH->addWidget(aspectRatio, 1);
     layoutH->addLayout(layoutV);
-    //layoutH->addStretch(1);
-    //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+}
 
-    //layoutV1->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
-    //layoutV1->addStretch(1);
-    //layoutV1->addLayout(layoutH, 0);
-    //layoutV1->addStretch(1);
-    //layoutV1->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+// Cheat verwendet
+void Interface::cheatDetected()
+{
+    mStatusBar->showMessage("Die Verwendung von Tipps führt zu einer Disqualifizierung von der Highscore Liste", 5000);
 
-    // Layout anwenden -> bereits bei initialisierung geschehen
-    //this->setLayout(layoutV1);
+    mHighscoreQualified = false;
+}
 
+// Spiel beendet
+void Interface::gameFinished(bool win)
+{
+    if(win)
+    {
+        mStatusBar->showMessage("Herzlichen Glückwunsch! Sie haben alle Mienen gefunden!", 5000);
+    }
+    else
+    {
+        mStatusBar->showMessage("Viel Glück beim nächsten Mal!", 5000);
+    }
+}
 
+// Pointer auf Game Widget zurückgeben
+Game *Interface::game() const
+{
+    return mGame;
 }

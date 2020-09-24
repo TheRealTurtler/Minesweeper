@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
-    auto interface = new Interface(this, statusBar());
+    mInterface = new Interface(this, statusBar());
     //auto interface = new Interface(this);
 
     /*
@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     */
 
     // Spiel zentrieren
-    setCentralWidget(interface);
+    setCentralWidget(mInterface);
 }
 
 MainWindow::~MainWindow()
@@ -92,6 +92,7 @@ void MainWindow::searchField()
 {
     // TODO
 
+    mInterface->game()->setMetaldetector(true);
 }
 
 // Spielanleitung

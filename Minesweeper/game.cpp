@@ -4,12 +4,6 @@
 Game::Game(const unsigned int columns, const unsigned int rows, const unsigned int mines, QWidget *parent)
     : QWidget(parent), mColumns(columns), mRows(rows), mMines(mines)
 {
-    // TODO
-    // Layout erstellen
-    //QHBoxLayout* layoutH = new QHBoxLayout;
-    //QVBoxLayout* layoutV = new QVBoxLayout;
-    //QGridLayout* gameLayout = new QGridLayout(this);
-
     // Vectorgröße anpassen
     mMineGrid.resize(mRows * mColumns);
     mMineGrid.shrink_to_fit();
@@ -38,49 +32,6 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
     }
 
     setMinimumSize(mColumns * mMineFieldMinimumSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldMinimumSize.height() + (mRows - 1) * mSpace);
-
-    //resize(mColumns * mMineFieldSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldSize.height() + (mRows - 1) * mSpace);
-
-    //resize(500, 500);
-
-    //auto layout = new QVBoxLayout(this);
-
-    //layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::Ignored));
-
-    //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    //adjustSize();
-
-
-
-
-    /*  // Macht keinen Unterschied
-    for(unsigned int i = 0; i < mRows; ++i)
-    {
-        gameLayout->setRowStretch(i, 0);
-    }
-
-    for(unsigned int i = 0; i < mColumns; ++i)
-    {
-        gameLayout->setColumnStretch(i, 0);
-    }
-    */
-
-    // Abstand zwischen den Feldern festlegen
-    //gameLayout->setSpacing(mSpace);
-
-    // TODO
-    // Spacer im Spielfeld herum hinzufügen
-    //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    //layoutH->addLayout(gameLayout);
-    //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
-
-    //layoutV->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    //layoutV->addLayout(layoutH);
-    //layoutV->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
-
-    // Layout anwenden -> bereits bei initialisierung geschehen
-    //this->setLayout(gameLayout);
 
     // RNG Initialisierung
     std::random_device randomDevice;
@@ -120,7 +71,6 @@ void Game::spreadMines(const unsigned int amount)
         }
 
         mMineGrid.at(randPos)->setMine(true);
-        //mMineGrid.at(randPos)->setImage(QPixmap(":/resources/mine.png"));
     }
 }
 
@@ -302,22 +252,39 @@ void Game::checkNearbyMines(const unsigned int index)
 // Angegebenes Feld aufdecken (wenn keine benachbarten Mienen -> benachbarte Felder aufdecken)
 void Game::searchField(MineField *mineField)
 {
+    // Überprüfe, ob dieses Feld bereits untersucht wurde
+    if(mineField->cleared())
+    {
+        return;
+    }
+
+    // Überprüfe Flaggenstatus des angegebenen Feldes
     if(mineField->flagState() != MineField::NONE)
     {
+        // Return, wenn Miene bereits aufgedeckt wurde
+        if(mineField->flagState() == MineField::DETECTED)
+        {
+            return;
+        }
+
+        // Flagge entfernen, wenn eine vorhanden war
         if(mineField->flagState() == MineField::FLAGGED)
         {
             --mFlags;
             emit flagRemoved(mMines - mFlags);
         }
 
+        // Flaggenstatus auf keine Markierung setzen
         mineField->setFlagState(MineField::NONE);
     }
 
-
+    // Überprüfung, ob KEINE Miene auf dem Feld liegt
     if(!mineField->isMine())
     {
+        // Feld als bereits untersucht markieren
         mineField->setCleared(true);
 
+        // Wenn keine benachbarten Mienen -> Nachbarfelder untersuchen
         if(!mineField->minesNearby())
         {
             for(const auto& i : getNearby(mineField))
@@ -369,6 +336,35 @@ void Game::searchField(MineField *mineField)
     }
 }
 
+// Cheat / Tipp | Angegebenes Feld auf Mienen untersuchen und diese aufdecken
+void Game::detectMine(MineField *mineField)
+{
+    // Signal für verwendeten Cheat senden
+    emit cheated();
+
+    // Überprüfe, ob auf angegebenen Feld eine Miene liegt
+    if(mineField->isMine())
+    {
+        // Signal für gefundene Miene ausgeben
+        emit mineDetected(true);
+
+        // Miene aufdecken
+        mineField->setFlagState(MineField::DETECTED);
+    }
+    else
+    {
+        // Signal für leeres Feld ausgeben
+        emit mineDetected(false);
+
+        // Feld normal aufdecken
+        searchField(mineField);
+    }
+
+    // Metalldetektor wieder ausschalten
+    mMetalDetector = false;
+}
+
+// Position des Mienenfeldes mit Index index ermitteln
 QPoint Game::getFieldPosition(unsigned int index)
 {
     QPoint* pos = new QPoint();
@@ -383,6 +379,18 @@ QPoint Game::getFieldPosition(unsigned int index)
 unsigned int Game::minesPlaced() const
 {
     return mMines;
+}
+
+// Metalldetektorstatus zurückgeben (Cheat / Tipp um nach Mienen zu suchen)
+bool Game::metalDetector() const
+{
+    return mMetalDetector;
+}
+
+// Metalldetektorstatus setzen (Cheat / Tipp um nach Mienen zu suchen)
+void Game::setMetaldetector(bool metalDetector)
+{
+    mMetalDetector = metalDetector;
 }
 
 // SLOT | Angeklicktes Feld aufdecken
@@ -402,12 +410,20 @@ void Game::slotSearchField()
     // Wenn Feld als Miene oder unbekannt markiert -> Markierung entfernen
     if(mineField->flagState() != MineField::NONE)
     {
+        // Return, wenn Miene bereits aufgedeckt wurde
+        if(mineField->flagState() == MineField::DETECTED)
+        {
+            return;
+        }
+
+        // Flagge entfernen, wenn eine vorhanden war
         if(mineField->flagState() == MineField::FLAGGED)
         {
             --mFlags;
             emit flagRemoved(mMines - mFlags);
         }
 
+        // Flaggenstatus auf keine Markierung setzen
         mineField->setFlagState(MineField::NONE);
 
         return;
@@ -456,8 +472,17 @@ void Game::slotSearchField()
         emit gameStarted();
     }
 
-    // Auf geklicktem Feld nach Miene suchen
-    searchField(mineField);
+    // Überprüfe Metalldetektorstatus (Cheat / Tipp)
+    if(mMetalDetector)
+    {
+        // Miene aufdecken
+        detectMine(mineField);
+    }
+    else
+    {
+        // Auf geklicktem Feld nach Miene suchen und Felder aufdecken
+        searchField(mineField);
+    }
 }
 
 // SLOT | Angeklicktes Feld mit einer Flagge markieren
@@ -538,20 +563,16 @@ void Game::resizeEvent(QResizeEvent *event)
             i->move(getFieldPosition(idx));
             i->resize(mMineFieldSize);
 
-            //i->setPixmap(i->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-
-            //i->setGeometry(idx % mColumns, idx / mColumns, fieldSize, fieldSize);
-
-            //i->updateGeometry();
-
             ++idx;
         }
 
+        /*
         QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())
                 + " | Field size: " + QString::number(mMineFieldSize.width()) + ", " + QString::number(mMineFieldSize.height())
                 + " | Actual field size: " + QString::number(mMineGrid.at(0)->size().width()) + ", " + QString::number(mMineGrid.at(0)->size().height())
                 + " | idx :" + QString::number(idx);
         mStatusBar->showMessage(message);
+        */
 
         return;
     }

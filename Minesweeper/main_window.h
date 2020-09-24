@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
 #include <QMainWindow>
 #include <QAction>
@@ -30,6 +30,8 @@ private:
     QAction* mSearchFieldAct;
     QAction* mHowToPlayAct;
     QAction* mAboutAct;
+
+    Interface* mInterface;
 
 private slots:
     void newGame();
