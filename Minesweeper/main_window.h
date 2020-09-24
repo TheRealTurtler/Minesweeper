@@ -8,6 +8,7 @@
 #include <QMessageBox>
 
 #include "interface.h"
+#include "new_game_selection.h"
 
 class MainWindow : public QMainWindow
 {
@@ -15,7 +16,6 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
 
 private:
     void createActions();
@@ -32,9 +32,11 @@ private:
     QAction* mAboutAct;
 
     Interface* mInterface;
+    NewGameSelection* mNewGameSelection;
 
 private slots:
     void newGame();
+    void newGameDialogFinished();
     void exit();
     void searchField();
     void howToPlay();

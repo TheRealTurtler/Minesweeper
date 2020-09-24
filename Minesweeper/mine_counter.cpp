@@ -4,7 +4,7 @@ MineCounter::MineCounter(QWidget *parent) : QWidget(parent)
 {
     auto layout = new QVBoxLayout(this);
 
-    auto label = new QLabel("Mines remaining:", this);
+    auto label = new QLabel("Mienen verbleibend:", this);
     mCounterLabel = new QLabel("0", this);
 
     label->setAlignment(Qt::AlignHCenter);

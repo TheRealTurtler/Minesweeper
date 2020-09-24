@@ -7,6 +7,12 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     mInterface = new Interface(this, statusBar());
+
+    mNewGameSelection = new NewGameSelection(this);
+
+    connect(mNewGameSelection, &QDialog::finished, this, &MainWindow::newGameDialogFinished);
+
+
     //auto interface = new Interface(this);
 
     /*
@@ -19,11 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Spiel zentrieren
     setCentralWidget(mInterface);
-}
-
-MainWindow::~MainWindow()
-{
-    // delete mGame;
 }
 
 // Menüeinträge erstellen
@@ -75,35 +76,43 @@ void MainWindow::createMenus()
     mHelpMenu->addAction(mAboutAct);
 }
 
-// Neues Spiel starten
+// SLOT | Neues Spiel starten
 void MainWindow::newGame()
 {
-    // TODO
-
-    unsigned int columns = 30;
-    unsigned int rows = 16;
-    unsigned int mines = 99;
-
-    mInterface->newGame(columns, rows, mines);
+    // Fenster anzeigen (open ist besser als exec) [modal, aber async]
+    mNewGameSelection->open();
 }
 
-// Programm beenden
+// SLOT | Auswahl der Spielfeldgröße beendet
+void MainWindow::newGameDialogFinished()
+{
+    // Starte neues Spiel, wenn eine Auswahl getroffen wurde
+    if(mNewGameSelection->result() == QDialog::Accepted)
+    {
+        mInterface->newGame(mNewGameSelection->columns(), mNewGameSelection->rows(), mNewGameSelection->mines());
+    }
+}
+
+// SLOT | Programm beenden
 void MainWindow::exit()
 {
     QApplication::quit();
 }
 
-// nächstes angeklicktes Feld auf Mienen untersuchen
+// SLOT | nächstes angeklicktes Feld auf Mienen untersuchen
 void MainWindow::searchField()
 {
     mInterface->game()->setMetaldetector(true);
 }
 
-// Spielanleitung
+// SLOT | Spielanleitung
 void MainWindow::howToPlay()
 {
     // Infofenster erstellen
     QMessageBox* howToPlay = new QMessageBox(this);
+
+    // Setze flag, dass das Fenster nach dem schließen deleted wird
+    howToPlay->setAttribute(Qt::WA_DeleteOnClose);
 
     // Überschrift
     howToPlay->setText("Spielanleitung");
@@ -127,16 +136,18 @@ void MainWindow::howToPlay()
     // Icon
     howToPlay->setIconPixmap(QPixmap(":/resources/mine.png"));
 
-    // Fenster anzeigen
-    howToPlay->show();
-    howToPlay->exec();
+    // Fenster anzeigen (open ist besser als exec) [modal, aber async]
+    howToPlay->open();
 }
 
-// Über dieses Programm
+// SLOT | Über dieses Programm
 void MainWindow::about()
 {
     // Infofenster erstellen
     QMessageBox* about = new QMessageBox(this);
+
+    // Setze flag, dass das Fenster nach dem schließen deleted wird
+    about->setAttribute(Qt::WA_DeleteOnClose);
 
     // Überschrift
     about->setText("Minesweeper");
@@ -147,7 +158,6 @@ void MainWindow::about()
     // Icon
     about->setIconPixmap(QPixmap(":/resources/mine.png"));
 
-    // Fenster anzeigen
-    about->show();
-    about->exec();
+    // Fenster anzeigen (open ist besser als exec) [modal, aber async]
+    about->open();
 }

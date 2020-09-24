@@ -33,6 +33,7 @@ public:
     void searchField(MineField* mineField);
     void detectMine(MineField* mineField);
     QPoint getFieldPosition(unsigned int index);
+    void resizeMineFields();
 
     // Get und Set Funktionen
     unsigned int columns() const;

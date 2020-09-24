@@ -14,6 +14,8 @@ public:
     explicit AspectRatioWidget(QWidget* widget, float aspectRatio, QWidget *parent = nullptr);
     explicit AspectRatioWidget(QWidget* widget, float width, float height, QWidget *parent = nullptr);
 
+    void stretchLayout();
+
     // Get und Set Funktionen
     void setAspectRatio(float aspectRatio);
     void setAspectRatio(float width, float height);

@@ -65,6 +65,8 @@ void Game::startGame(const unsigned int columns, const unsigned int rows, const 
 
     // RNG
     mDistribution = std::uniform_int_distribution<size_t>(0, mMineGrid.size() - 1);
+
+    resizeMineFields();
 }
 
 // Mienenfelder löschen
@@ -410,6 +412,39 @@ QPoint Game::getFieldPosition(unsigned int index)
     return *pos;
 }
 
+// Berechnung und Setzen der Größe und Position der Mienenfelder
+void Game::resizeMineFields()
+{
+    int fieldSize;
+
+    // Größe der Felder berechnen
+    if(width() > height())
+    {
+        // Game Widget breiter als hoch
+
+        fieldSize = (height() - mSpace * (mRows - 1)) / mRows;          // int division genau genug
+        mMineFieldSize = QSize(fieldSize, fieldSize);
+    }
+    else
+    {
+        // Game Widget höher als breit
+
+        fieldSize = (width() - mSpace * (mColumns - 1)) / mColumns;     // int division genau genug
+        mMineFieldSize = QSize(fieldSize, fieldSize);
+    }
+
+    unsigned int idx = 0;
+
+    // Felder auf berechnete Größe skalieren
+    for(const auto& i : mMineGrid)
+    {
+        i->move(getFieldPosition(idx));
+        i->resize(mMineFieldSize);
+
+        ++idx;
+    }
+}
+
 unsigned int Game::columns() const
 {
     return mColumns;
@@ -590,34 +625,7 @@ void Game::resizeEvent(QResizeEvent *event)
 
     if(event->oldSize() != size())
     {
-        int fieldSize;
-
-        // Größe der Felder berechnen
-        if(width() > height())
-        {
-            // Game Widget breiter als hoch
-
-            fieldSize = (height() - mSpace * (mRows - 1)) / mRows;          // int division genau genug
-            mMineFieldSize = QSize(fieldSize, fieldSize);
-        }
-        else
-        {
-            // Game Widget höher als breit
-
-            fieldSize = (width() - mSpace * (mColumns - 1)) / mColumns;     // int division genau genug
-            mMineFieldSize = QSize(fieldSize, fieldSize);
-        }
-
-        unsigned int idx = 0;
-
-        // Felder auf berechnete Größe skalieren
-        for(const auto& i : mMineGrid)
-        {
-            i->move(getFieldPosition(idx));
-            i->resize(mMineFieldSize);
-
-            ++idx;
-        }
+        resizeMineFields();
 
         /*
         QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())

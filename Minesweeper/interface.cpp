@@ -27,11 +27,11 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     connect(mGame, &Game::gameFinished, this, &Interface::gameFinished);
 
     /*
-    aspectRatio->setAutoFillBackground(true);
-    aspectRatio->setPalette(QPalette(QPalette::Background, Qt::red));
+    mAspectRatio->setAutoFillBackground(true);
+    mAspectRatio->setPalette(QPalette(QPalette::Background, Qt::red));
 
-    game->setAutoFillBackground(true);
-    game->setPalette(QPalette(QPalette::Background, Qt::green));
+    mGame->setAutoFillBackground(true);
+    mGame->setPalette(QPalette(QPalette::Background, Qt::green));
 
     timer->setAutoFillBackground(true);
     timer->setPalette(QPalette(QPalette::Background, Qt::yellow));

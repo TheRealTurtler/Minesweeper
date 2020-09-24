@@ -17,6 +17,7 @@ aspect_ratio_widget.cpp \
 	main_window.cpp \
 	mine_counter.cpp \
 	mine_field.cpp \
+	new_game_selection.cpp \
 	timer.cpp
 
 HEADERS += \
@@ -27,6 +28,7 @@ aspect_ratio_widget.h \
 	main_window.h \
 	mine_counter.h \
 	mine_field.h \
+	new_game_selection.h \
 	timer.h
 
 # Default rules for deployment.

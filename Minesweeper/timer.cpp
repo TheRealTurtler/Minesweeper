@@ -8,7 +8,7 @@ Timer::Timer(QWidget *parent) : QWidget(parent)
 
     connect(mTimer, &QTimer::timeout, this, &Timer::addSecond);
 
-    auto label = new QLabel("Time passed:", this);
+    auto label = new QLabel("Zeit vergangen:", this);
     mTimerLabel = new QLabel("00:00", this);
 
     label->setAlignment(Qt::AlignHCenter);

@@ -8,6 +8,7 @@
 class Icon : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit Icon(QWidget *parent = nullptr);
 
