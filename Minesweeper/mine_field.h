@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QMouseEvent>
+#include <QResizeEvent>
 
 class MineField : public QLabel
 {

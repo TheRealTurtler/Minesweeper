@@ -8,6 +8,7 @@
 #include <random>
 #include <algorithm>
 #include <QStatusBar>
+#include <QResizeEvent>
 
 #include "mine_field.h"
 
@@ -62,8 +63,8 @@ private:
     bool mFirstClick = true;
     bool mGameOver = false;
 
-    QSize mMineFieldSize = QSize(48, 48);                   // Größe eines Mienenfeldes
-    const QSize mMineFieldMinimumSize = QSize(16, 16);;      // Mindestgröße eines Mienenfeldes
+    const QSize mMineFieldMinimumSize = QSize(32, 32);;      // Mindestgröße eines Mienenfeldes
+    QSize mMineFieldSize = mMineFieldMinimumSize;                   // Größe eines Mienenfeldes
 
     // RNG
     std::mt19937 mRandomEngine;

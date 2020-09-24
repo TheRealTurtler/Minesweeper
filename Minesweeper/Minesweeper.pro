@@ -9,23 +9,25 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    aspect_ratio_widget.cpp \
-    game.cpp \
-    interface.cpp \
-    main.cpp \
-    main_window.cpp \
-    mine_counter.cpp \
-    mine_field.cpp \
-    timer.cpp
+aspect_ratio_widget.cpp \
+	game.cpp \
+	icon.cpp \
+	interface.cpp \
+	main.cpp \
+	main_window.cpp \
+	mine_counter.cpp \
+	mine_field.cpp \
+	timer.cpp
 
 HEADERS += \
-    aspect_ratio_widget.h \
-    game.h \
-    interface.h \
-    main_window.h \
-    mine_counter.h \
-    mine_field.h \
-    timer.h
+aspect_ratio_widget.h \
+	game.h \
+	icon.h \
+	interface.h \
+	main_window.h \
+	mine_counter.h \
+	mine_field.h \
+	timer.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -35,4 +37,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES +=
 
 RESOURCES += \
-    resources.qrc
+resources.qrc
+
+RC_ICONS = resources/mine.ico

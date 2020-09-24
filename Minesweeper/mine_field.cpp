@@ -155,7 +155,15 @@ void MineField::mousePressEvent(QMouseEvent* event)
 // EVENT | Fenstergröße geändert -> wahrscheinlich hier unnötig
 void MineField::resizeEvent(QResizeEvent *event)
 {
-    this->setPixmap(mPixmap.scaled(size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    // Überprüfen, ob sich die Größe wirklich verändert hat
+    if(event->oldSize() != size())
+    {
+        // Größe ändern
+        setPixmap(mPixmap.scaled(size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
+        return;
+    }
+
+    // Event weitergeben
     return QLabel::resizeEvent(event);
 }

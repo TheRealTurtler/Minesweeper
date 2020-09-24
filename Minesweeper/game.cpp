@@ -41,6 +41,8 @@ Game::Game(const unsigned int columns, const unsigned int rows, const unsigned i
 
     //resize(mColumns * mMineFieldSize.width() + (mColumns - 1) * mSpace, mRows * mMineFieldSize.height() + (mRows - 1) * mSpace);
 
+    //resize(500, 500);
+
     //auto layout = new QVBoxLayout(this);
 
     //layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::Ignored));
@@ -300,14 +302,17 @@ void Game::checkNearbyMines(const unsigned int index)
 // Angegebenes Feld aufdecken (wenn keine benachbarten Mienen -> benachbarte Felder aufdecken)
 void Game::searchField(MineField *mineField)
 {
-    if(mineField->flagState() == MineField::FLAGGED)
+    if(mineField->flagState() != MineField::NONE)
     {
-        mineField->setFlagState(MineField::NONE);
-        --mFlags;
-        emit flagRemoved(mMines - mFlags);
+        if(mineField->flagState() == MineField::FLAGGED)
+        {
+            --mFlags;
+            emit flagRemoved(mMines - mFlags);
+        }
 
-        return;
+        mineField->setFlagState(MineField::NONE);
     }
+
 
     if(!mineField->isMine())
     {
@@ -393,6 +398,20 @@ void Game::slotSearchField()
 
     // Sender des signals ermitteln
     MineField* mineField = qobject_cast <MineField*>(sender());
+
+    // Wenn Feld als Miene oder unbekannt markiert -> Markierung entfernen
+    if(mineField->flagState() != MineField::NONE)
+    {
+        if(mineField->flagState() == MineField::FLAGGED)
+        {
+            --mFlags;
+            emit flagRemoved(mMines - mFlags);
+        }
+
+        mineField->setFlagState(MineField::NONE);
+
+        return;
+    }
 
     // Beim ersten Klick Mienen verteilen
     if(mFirstClick)
@@ -491,47 +510,52 @@ void Game::resizeEvent(QResizeEvent *event)
     // Wenn resizeEvent aufgerufen wird, hat das Widget bereits seine neue Größe
     // -> kann einfach width(), height() verwenden
 
-    int fieldSize;
-
-    // Größe der Felder berechnen
-    if(width() > height())
+    if(event->oldSize() != size())
     {
-        // Game Widget breiter als hoch
+        int fieldSize;
 
-        fieldSize = (height() - mSpace * (mRows - 1)) / mRows;          // int division genau genug
-        mMineFieldSize = QSize(fieldSize, fieldSize);
+        // Größe der Felder berechnen
+        if(width() > height())
+        {
+            // Game Widget breiter als hoch
+
+            fieldSize = (height() - mSpace * (mRows - 1)) / mRows;          // int division genau genug
+            mMineFieldSize = QSize(fieldSize, fieldSize);
+        }
+        else
+        {
+            // Game Widget höher als breit
+
+            fieldSize = (width() - mSpace * (mColumns - 1)) / mColumns;     // int division genau genug
+            mMineFieldSize = QSize(fieldSize, fieldSize);
+        }
+
+        unsigned int idx = 0;
+
+        // Felder auf berechnete Größe skalieren
+        for(const auto& i : mMineGrid)
+        {
+            i->move(getFieldPosition(idx));
+            i->resize(mMineFieldSize);
+
+            //i->setPixmap(i->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+
+            //i->setGeometry(idx % mColumns, idx / mColumns, fieldSize, fieldSize);
+
+            //i->updateGeometry();
+
+            ++idx;
+        }
+
+        QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())
+                + " | Field size: " + QString::number(mMineFieldSize.width()) + ", " + QString::number(mMineFieldSize.height())
+                + " | Actual field size: " + QString::number(mMineGrid.at(0)->size().width()) + ", " + QString::number(mMineGrid.at(0)->size().height())
+                + " | idx :" + QString::number(idx);
+        mStatusBar->showMessage(message);
+
+        return;
     }
-    else
-    {
-        // Game Widget höher als breit
 
-        fieldSize = (width() - mSpace * (mColumns - 1)) / mColumns;     // int division genau genug
-        mMineFieldSize = QSize(fieldSize, fieldSize);
-    }
-
-    unsigned int idx = 0;
-
-    // Felder auf berechnete Größe skalieren
-    for(const auto& i : mMineGrid)
-    {
-        i->move(getFieldPosition(idx));
-        i->resize(mMineFieldSize);
-
-        //i->setPixmap(i->pixmap().scaled(mMineFieldSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-
-        //i->setGeometry(idx % mColumns, idx / mColumns, fieldSize, fieldSize);
-
-        //i->updateGeometry();
-
-        ++idx;
-    }
-
-    QString message = "Game Widget size: " + QString::number(width()) + ", " + QString::number(height())
-            + " | Field size: " + QString::number(mMineFieldSize.width()) + ", " + QString::number(mMineFieldSize.height())
-            + " | Actual field size: " + QString::number(mMineGrid.at(0)->size().width()) + ", " + QString::number(mMineGrid.at(0)->size().height())
-            + " | idx :" + QString::number(idx);
-    mStatusBar->showMessage(message);
-
-    // Event weitergeben -> unnötig?
+    // Event weitergeben
     return QWidget::resizeEvent(event);
 }

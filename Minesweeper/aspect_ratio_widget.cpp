@@ -25,31 +25,38 @@ AspectRatioWidget::AspectRatioWidget(QWidget *widget, float width, float height,
 
 void AspectRatioWidget::resizeEvent(QResizeEvent *event)
 {
-    float currentAspectRatio = static_cast<float>(width()) / height();
-    int stretchFactorWidget = 0;
-    int stretchFactorSpacing = 0;
-
-    if(currentAspectRatio > mAspectRatio)
+    // Überprüfen, ob sich Größe wirklich geändert hat
+    if(event->oldSize() != size())
     {
-        // Widget ist zu breit
+        float currentAspectRatio = static_cast<float>(width()) / height();
+        int stretchFactorWidget = 0;
+        int stretchFactorSpacing = 0;
 
-        mLayout->setDirection(QBoxLayout::LeftToRight);
-        stretchFactorWidget = height() * mAspectRatio;      // = neue Breite
-        stretchFactorSpacing = (width() - stretchFactorWidget) / 2 + 1;
+        if(currentAspectRatio > mAspectRatio)
+        {
+            // Widget ist zu breit
+
+            mLayout->setDirection(QBoxLayout::LeftToRight);
+            stretchFactorWidget = height() * mAspectRatio;                      // = neue Breite
+            stretchFactorSpacing = (width() - stretchFactorWidget) / 2 + 1;     // + 1 für Rechenfehler von in division
+        }
+        else
+        {
+            // Widget ist zu hoch
+
+            mLayout->setDirection(QBoxLayout::TopToBottom);
+            stretchFactorWidget = width() / mAspectRatio;                       // = neue Höhe
+            stretchFactorSpacing = (height() - stretchFactorWidget) / 2 + 1;    // + 1 für Rechenfehler von in division
+        }
+
+        mLayout->setStretch(0, stretchFactorSpacing);
+        mLayout->setStretch(1, stretchFactorWidget);
+        mLayout->setStretch(2, stretchFactorSpacing);
+
+        return;
     }
-    else
-    {
-        // Widget ist zu hoch
 
-        mLayout->setDirection(QBoxLayout::TopToBottom);
-        stretchFactorWidget = width() / mAspectRatio;      // = neue Höhe
-        stretchFactorSpacing = (height() - stretchFactorWidget) / 2 + 1;
-    }
-
-    mLayout->setStretch(0, stretchFactorSpacing);
-    mLayout->setStretch(1, stretchFactorWidget);
-    mLayout->setStretch(2, stretchFactorSpacing);
-
+    // Event weitergeben
     return QWidget::resizeEvent(event);
 }
 

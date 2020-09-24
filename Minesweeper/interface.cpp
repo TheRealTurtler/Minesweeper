@@ -7,9 +7,9 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     auto layoutV = new QVBoxLayout;
 
     // Spiel erstellen
-    unsigned int columns = 9;
-    unsigned int rows = 9;
-    unsigned int mines = 10;
+    unsigned int columns = 16;
+    unsigned int rows = 16;
+    unsigned int mines = 40;
 
     auto game = new Game(columns, rows, mines);
 
@@ -23,9 +23,7 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
 
     auto mineCounter = new MineCounter(this);
 
-    auto icon = new QLabel(this);
-
-    icon->setPixmap(QPixmap(":/resources/mine.png"));
+    auto icon = new Icon(this);
 
     connect(game, &Game::gameStarted, timer, &Timer::startTimer);
     connect(game, &Game::gameFinished, timer, &Timer::stopTimer);
@@ -56,7 +54,7 @@ Interface::Interface(QWidget *parent, QStatusBar* statusBar) : QWidget(parent), 
     layoutV->addWidget(timer);
     layoutV->addWidget(mineCounter);
     layoutV->addStretch(1);
-    layoutV->addWidget(icon, 0, Qt::AlignCenter);
+    layoutV->addWidget(icon);
     layoutV->addStretch(1);
 
     //layoutH->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
