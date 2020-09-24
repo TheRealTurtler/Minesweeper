@@ -43,7 +43,7 @@ NewGameSelection::NewGameSelection(QWidget* parent) : QDialog(parent)
     //mAdvanced->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Minimale größe festlegen, es wird ansonsten eine Warnung ausgegeben
-    //setMinimumSize(200, 200);
+    setMinimumSize(200, 200);
 
     // Buttons zu Layout hinzufügen
     layoutSelection->addWidget(mEasy, 0, 0);
