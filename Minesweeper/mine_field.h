@@ -2,7 +2,6 @@
 #define MINE_FIELD_H
 
 #include <QMouseEvent>
-#include <QResizeEvent>
 
 #include "clickable_label.h"
 
@@ -37,7 +36,6 @@ signals:
 
 protected:
    virtual void mousePressEvent(QMouseEvent* event) override;
-   //virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
    bool mIsMine = false;
@@ -46,4 +44,4 @@ private:
    unsigned short mMinesNearby = 0;
 };
 
-#endif // MINEFIELD_H
+#endif // MINE_FIELD_H

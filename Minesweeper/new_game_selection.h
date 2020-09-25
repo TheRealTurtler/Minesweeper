@@ -16,6 +16,11 @@ class NewGameSelection : public QDialog
 public:
     explicit NewGameSelection(QWidget* parent = nullptr);
 
+    void selectEasy();
+    void selectAdvanced();
+    void selectExpert();
+    void selectCustom();
+
     // Get und Set Funktionen
     unsigned int columns() const;
     unsigned int rows() const;
@@ -23,11 +28,6 @@ public:
 
 public slots:
     void selectSize();
-
-    void selectEasy();
-    void selectAdvanced();
-    void selectExpert();
-    void selectCustom();
 
 signals:
     void selectedDefaultSize(int size);

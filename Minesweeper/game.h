@@ -10,7 +10,7 @@
 #include <QResizeEvent>
 #include <QMouseEvent>
 #include <QCursor>
-#include <QGuiApplication>
+//#include <QGuiApplication>
 
 #include "mine_field.h"
 

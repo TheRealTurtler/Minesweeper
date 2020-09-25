@@ -8,6 +8,7 @@ Game::Game(QWidget *parent) : QWidget(parent)
     mRandomEngine = std::mt19937(randomDevice());
 }
 
+// Constructor mit Spielfeldgröße und Mienenanzahl
 Game::Game(const unsigned int columns, const unsigned int rows, const unsigned int mines, QWidget *parent)
     : QWidget(parent)
 {
@@ -617,7 +618,7 @@ void Game::slotFlagMine()
     }
 }
 
-// EVENT | Fenstergröße ändern
+// EVENT | Größe geändert
 void Game::resizeEvent(QResizeEvent *event)
 {
     // Wenn resizeEvent aufgerufen wird, hat das Widget bereits seine neue Größe

@@ -1,8 +1,9 @@
 #include "icon.h"
 
+// Constructor
 Icon::Icon(QWidget *parent) : QWidget(parent)
 {
-    auto pixmap = QPixmap(":/resources/mine.png");
+    QPixmap pixmap(":/resources/mine.png");
 
     auto icon = new QLabel(this);
     icon->setPixmap(pixmap);

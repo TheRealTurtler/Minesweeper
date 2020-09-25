@@ -1,28 +1,22 @@
 #include "main_window.h"
 
+// Constructor
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // Menüleiste erstellen
     createActions();
     createMenus();
 
+    // Interface erstellen (beinhaltet Spielfeld, Timer, Mienenzähler)
     mInterface = new Interface(this);
     mInterface->setStatusBar(statusBar());
 
+    // Spielfeldgrößenauswahl erstellen
     mNewGameSelection = new NewGameSelection(this);
 
+    // Signale und Slots verbinden
     connect(mNewGameSelection, &QDialog::finished, this, &MainWindow::newGameDialogFinished);
-
-
-    //auto interface = new Interface(this);
-
-    /*
-    QPalette pal;
-    pal.setColor(QPalette::Background, Qt::black);
-
-    interface->setAutoFillBackground(true);
-    interface->setPalette(pal);
-    */
 
     // Spiel zentrieren
     setCentralWidget(mInterface);
