@@ -12,6 +12,7 @@ NewGameSelection::NewGameSelection(QWidget* parent) : QDialog(parent)
     auto layoutSelection = new QGridLayout(selection);
     auto layout = new QVBoxLayout(this);
 
+    // Rand des LAyouts entfernen
     layoutSelection->setContentsMargins(0,0,0,0);
 
     // Buttons initialisieren
@@ -22,43 +23,34 @@ NewGameSelection::NewGameSelection(QWidget* parent) : QDialog(parent)
     auto custom = new QPushButton("Benutzerdefiniert: #x#", this);
     */
 
+    mSelectionGrid.resize(4);
+    mSelectionGrid.shrink_to_fit();
 
+    for(unsigned int i = 0; i < 4 ; ++i)
+    {
+        auto sizeSelection = new SizeSelection(static_cast<SizeSelection::GameSize>(i), selection);
 
-    mEasy = new ClickableLabel(selection);
-    mAdvanced = new ClickableLabel(selection);
-    mExpert = new ClickableLabel(selection);
-    mCustom = new ClickableLabel(selection);
+        //sizeSelection->setMinimumSize(64, 64);
 
-    mEasy->setMinimumSize(64, 64);
-    mAdvanced->setMinimumSize(64, 64);
-    mExpert->setMinimumSize(64, 64);
-    mCustom->setMinimumSize(64, 64);
+        // Button zu Layout hinzufügen
+        layoutSelection->addWidget(sizeSelection, i / 2, i % 2);
 
-    mEasy->setImage(QPixmap(":resources/easy.png"));
-    mAdvanced->setImage(QPixmap(":resources/advanced.png"));
-    mExpert->setImage(QPixmap(":resources/expert.png"));
-    mCustom->setImage(QPixmap(":resources/custom.png"));
+        // Signal und Slot verbinden
+        connect(sizeSelection, &ClickableLabel::clicked, this, &NewGameSelection::selectSize);
+
+        mSelectionGrid.at(i) = sizeSelection;
+    }
+
+    //mEasy->setImage(QPixmap(":resources/easy.png"));
+    //mAdvanced->setImage(QPixmap(":resources/advanced.png"));
+    //mExpert->setImage(QPixmap(":resources/expert.png"));
+    //mCustom->setImage(QPixmap(":resources/custom.png"));
 
     //mEasy->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //mAdvanced->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Minimale größe festlegen, es wird ansonsten eine Warnung ausgegeben
     setMinimumSize(200, 200);
-
-    // Buttons zu Layout hinzufügen
-    layoutSelection->addWidget(mEasy, 0, 0);
-    layoutSelection->addWidget(mAdvanced, 0, 1);
-    layoutSelection->addWidget(mExpert, 1, 0);
-    layoutSelection->addWidget(mCustom, 1, 1);
-
-    // Signale und Slots verbinden
-    connect(mEasy, &ClickableLabel::clicked, this, &NewGameSelection::selectEasy);
-    connect(mAdvanced, &ClickableLabel::clicked, this, &NewGameSelection::selectAdvanced);
-    connect(mExpert, &ClickableLabel::clicked, this, &NewGameSelection::selectExpert);
-    connect(mCustom, &ClickableLabel::clicked, this, &NewGameSelection::selectCustom);
-
-    // Button für benutzerdefinierte Größe deaktivieren -> TODO
-    //custom->setEnabled(false);
 
     auto aspectRatio = new AspectRatioWidget(selection, 2, 2, this);
 
@@ -89,6 +81,29 @@ unsigned int NewGameSelection::rows() const
 unsigned int NewGameSelection::mines() const
 {
     return mMines;
+}
+
+void NewGameSelection::selectSize()
+{
+    SizeSelection* selection = qobject_cast<SizeSelection*>(sender());
+
+    switch(selection->gameSize())
+    {
+    case SizeSelection::EASY:
+        selectEasy();
+        break;
+    case SizeSelection::ADVANCED:
+        selectAdvanced();
+        break;
+    case SizeSelection::EXPERT:
+        selectExpert();
+        break;
+    case SizeSelection::CUSTOM:
+        selectCustom();
+        break;
+    default:
+        break;
+    }
 }
 
 // SLOT | Schwierigkeit: Einfach gewählt

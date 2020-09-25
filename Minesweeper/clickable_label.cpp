@@ -14,7 +14,7 @@ QPixmap ClickableLabel::originalPixmap()
 // Bild für dieses Feld festlegen
 void ClickableLabel::setImage(const QPixmap &pixmap)
 {
-    setPixmap(pixmap.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    setPixmap(pixmap.scaled(sizeHint(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     mPixmap = pixmap;
 }

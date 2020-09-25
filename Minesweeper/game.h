@@ -2,8 +2,8 @@
 #define GAME_H
 
 #include <QWidget>
-#include <QBoxLayout>
-#include <QIcon>
+//#include <QBoxLayout>
+//#include <QIcon>
 #include <random>
 #include <algorithm>
 //#include <QStatusBar>

@@ -6,8 +6,8 @@
 //#include <QPushButton>
 #include <QVBoxLayout>
 
-#include "clickable_label.h"
 #include "aspect_ratio_widget.h"
+#include "size_selection.h"
 
 class NewGameSelection : public QDialog
 {
@@ -22,6 +22,8 @@ public:
     unsigned int mines() const;
 
 public slots:
+    void selectSize();
+
     void selectEasy();
     void selectAdvanced();
     void selectExpert();
@@ -36,10 +38,7 @@ private:
     unsigned int mRows = 0;
     unsigned int mMines = 0;
 
-    ClickableLabel* mEasy;
-    ClickableLabel* mAdvanced;
-    ClickableLabel* mExpert;
-    ClickableLabel* mCustom;
+    std::vector<SizeSelection*> mSelectionGrid;
 };
 
 #endif // NEW_GAME_SELECTION_H

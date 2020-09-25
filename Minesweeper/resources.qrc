@@ -16,9 +16,5 @@
         <file>resources/unknown.png</file>
         <file>resources/metal_detector.png</file>
         <file>resources/mine.ico</file>
-        <file>resources/advanced.png</file>
-        <file>resources/custom.png</file>
-        <file>resources/easy.png</file>
-        <file>resources/expert.png</file>
     </qresource>
 </RCC>
