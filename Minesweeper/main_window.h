@@ -42,4 +42,4 @@ private slots:
     void howToPlay();
     void about();
 };
-#endif // MAINWINDOW_H
+#endif // MAIN_WINDOW_H

@@ -24,7 +24,26 @@ NewGameSelection::NewGameSelection(QWidget* parent) : QDialog(parent)
     for(unsigned int i = 0; i < 4 ; ++i)
     {
         // Neue Größenauswahl erstellen
-        auto sizeSelection = new SizeSelection(static_cast<SizeSelection::GameSize>(i), selection);
+        SizeSelection* sizeSelection;
+
+        switch(i)
+        {
+        case 0:
+            sizeSelection = new SizeSelection(SizeSelection::EASY, selection);
+            break;
+        case 1:
+            sizeSelection = new SizeSelection(SizeSelection::ADVANCED, selection);
+            break;
+        case 2:
+            sizeSelection = new SizeSelection(SizeSelection::EXPERT, selection);
+            break;
+        case 3:
+            sizeSelection = new SizeSelection(SizeSelection::CUSTOM, selection);
+            break;
+        default:
+            sizeSelection = nullptr;
+            break;
+        }
 
         // Minimale Größe der Auswahltaste festlegen
         sizeSelection->setMinimumSize(64,64);
@@ -101,6 +120,12 @@ void NewGameSelection::selectExpert()
 void NewGameSelection::selectCustom()
 {
     // TODO
+
+    mCustomGameSize = new CustomGameSize(this);
+
+    connect(mCustomGameSize, &CustomGameSize::finished, this, &NewGameSelection::selectCustomFinished);
+
+    mCustomGameSize->open();
 }
 
 // SLOT | Schwierigkeit gewählt
@@ -124,5 +149,24 @@ void NewGameSelection::selectSize()
         break;
     default:
         break;
+    }
+}
+
+// SLOT | Benutzerdefinierte Spielfeldgröße gesetzt
+void NewGameSelection::selectCustomFinished()
+{
+    if(mCustomGameSize->result() == QDialog::Accepted)
+    {
+        mColumns = mCustomGameSize->columns();
+        mRows = mCustomGameSize->rows();
+        mMines = mCustomGameSize->mines();
+
+        delete mCustomGameSize;
+
+        accept();
+    }
+    else
+    {
+        delete mCustomGameSize;
     }
 }

@@ -8,6 +8,7 @@
 
 #include "aspect_ratio_widget.h"
 #include "size_selection.h"
+#include "custom_game_size.h"
 
 class NewGameSelection : public QDialog
 {
@@ -28,6 +29,7 @@ public:
 
 public slots:
     void selectSize();
+    void selectCustomFinished();
 
 signals:
     void selectedDefaultSize(int size);
@@ -39,6 +41,8 @@ private:
     unsigned int mMines = 0;
 
     std::vector<SizeSelection*> mSelectionGrid;
+
+    CustomGameSize* mCustomGameSize;
 };
 
 #endif // NEW_GAME_SELECTION_H

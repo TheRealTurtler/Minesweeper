@@ -12,12 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
     mInterface = new Interface(this);
     mInterface->setStatusBar(statusBar());
 
-    // Spielfeldgrößenauswahl erstellen
-    mNewGameSelection = new NewGameSelection(this);
-
-    // Signale und Slots verbinden
-    connect(mNewGameSelection, &QDialog::finished, this, &MainWindow::newGameDialogFinished);
-
     // Spiel zentrieren
     setCentralWidget(mInterface);
 }
@@ -74,6 +68,12 @@ void MainWindow::createMenus()
 // SLOT | Neues Spiel starten
 void MainWindow::newGame()
 {
+    // Spielfeldgrößenauswahl erstellen
+    mNewGameSelection = new NewGameSelection(this);
+
+    // Signale und Slots verbinden
+    connect(mNewGameSelection, &QDialog::finished, this, &MainWindow::newGameDialogFinished);
+
     // Fenster anzeigen (open ist besser als exec) [modal, aber async]
     mNewGameSelection->open();
 }
@@ -86,6 +86,8 @@ void MainWindow::newGameDialogFinished()
     {
         mInterface->newGame(mNewGameSelection->columns(), mNewGameSelection->rows(), mNewGameSelection->mines());
     }
+
+    delete mNewGameSelection;
 }
 
 // SLOT | Programm beenden
