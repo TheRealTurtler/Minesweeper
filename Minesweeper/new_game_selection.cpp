@@ -119,12 +119,13 @@ void NewGameSelection::selectExpert()
 // Schwierigkeit: Benutzerdefiniert gewählt
 void NewGameSelection::selectCustom()
 {
-    // TODO
-
+    // CustomGameSize Fenster erstellen
     mCustomGameSize = new CustomGameSize(this);
 
+    // Signal und Slot verbinden
     connect(mCustomGameSize, &CustomGameSize::finished, this, &NewGameSelection::selectCustomFinished);
 
+    // Fenster anzeigen
     mCustomGameSize->open();
 }
 
@@ -155,18 +156,21 @@ void NewGameSelection::selectSize()
 // SLOT | Benutzerdefinierte Spielfeldgröße gesetzt
 void NewGameSelection::selectCustomFinished()
 {
+    // Überprüfung, ob eine Auswahl bestätigt wurde
     if(mCustomGameSize->result() == QDialog::Accepted)
     {
         mColumns = mCustomGameSize->columns();
         mRows = mCustomGameSize->rows();
         mMines = mCustomGameSize->mines();
 
+        // Speicher des Auswahlfensters wieder freigeben
         delete mCustomGameSize;
 
         accept();
     }
     else
     {
+        // Speicher des Auswahlfensters wieder freigeben
         delete mCustomGameSize;
     }
 }
