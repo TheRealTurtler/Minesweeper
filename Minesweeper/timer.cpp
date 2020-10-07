@@ -45,7 +45,7 @@ void Timer::addSecond()
         ++mMinutes;
     }
 
-    QString text = QString("%1:%2").arg(QString::number(mMinutes), 2, '0').arg(QString::number(mSeconds), 2, '0');
+    QString text = QString("%1:%2").arg(mMinutes, 2, 10, QLatin1Char('0')).arg(mSeconds, 2, 10, QLatin1Char('0'));
 
     mTimerLabel->setText(text);
 }
@@ -59,4 +59,19 @@ void Timer::resetTimer()
     mMinutes = 0;
 
     mTimerLabel->setText("00:00");
+}
+
+unsigned int Timer::minutes() const
+{
+    return mMinutes;
+}
+
+unsigned int Timer::seconds() const
+{
+    return mSeconds;
+}
+
+unsigned int Timer::totalSeconds() const
+{
+    return mMinutes * 60 + mSeconds;
 }

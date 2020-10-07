@@ -18,6 +18,9 @@ Interface::Interface(QWidget *parent) : QWidget(parent)
     // Timer erstellen
     mTimer = new Timer(this);
 
+    // Bestzeit erstellen
+    mBestTime = new BestTime(this);
+
     // Mienenzähler erstellen
     mMineCounter = new MineCounter(this);
 
@@ -46,6 +49,9 @@ Interface::Interface(QWidget *parent) : QWidget(parent)
     mineCounter->setPalette(QPalette(QPalette::Background, Qt::blue));
     */
 
+    // Bestzeit anzeigen
+    mBestTime->displayBestTime(mGame->columns(), mGame->rows(), mGame->minesPlaced());
+
     // Verbleibende Mienenzahl anzeigen
     mMineCounter->displayRemainingMines(mGame->minesPlaced());
 
@@ -54,6 +60,7 @@ Interface::Interface(QWidget *parent) : QWidget(parent)
     // Timer und Mienenzähler zu vertikalem Layout hinzufügen
     layoutV->addStretch(1);
     layoutV->addWidget(mTimer);
+    layoutV->addWidget(mBestTime);
     layoutV->addWidget(mMineCounter);
     layoutV->addStretch(1);
     layoutV->addWidget(icon);
@@ -72,6 +79,9 @@ void Interface::newGame(const unsigned int columns, const unsigned int rows, con
 
     // Timer zurücksetzen
     mTimer->resetTimer();
+
+    // Bestzeit für neue Spielfeldgröße anzeigen
+    mBestTime->displayBestTime(columns, rows, mines);
 
     // Verbleibende Mienenanzahl zurücksetzen
     mMineCounter->displayRemainingMines(mines);
@@ -100,6 +110,26 @@ void Interface::gameFinished(bool win)
     {
         // Statusnachricht ausgeben (gewonnen)
         mStatusBar->showMessage("Herzlichen Glückwunsch! Sie haben alle Mienen gefunden!", 5000);
+
+        // Cheats erkannt?
+        if(mHighscoreQualified)
+        {
+            // Bestzeit für derzeitige Spielfeldgröße verfügbar?
+            if(mBestTime->available())
+            {
+                // Ja -> Zeit besser als Bestzeit?
+                if(mBestTime->totalSeconds() > mTimer->totalSeconds())
+                {
+                    // Zeit als neue Bestzeit speichern
+                    mBestTime->saveBestTime(mGame->columns(), mGame->rows(), mGame->minesPlaced(), mTimer->minutes(), mTimer->seconds());
+                }
+            }
+            else
+            {
+                // Nein -> Zeit als neue Bestzeit speichern
+                mBestTime->saveBestTime(mGame->columns(), mGame->rows(), mGame->minesPlaced(), mTimer->minutes(), mTimer->seconds());
+            }
+        }
     }
     else
     {

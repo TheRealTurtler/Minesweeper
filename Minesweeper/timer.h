@@ -15,6 +15,11 @@ public:
     void addSecond();   // -> private?
     void resetTimer();
 
+    // Get und Set Funktionen
+    unsigned int minutes() const;
+    unsigned int seconds() const;
+    unsigned int totalSeconds() const;
+
 public slots:
     void startTimer();
     void stopTimer();

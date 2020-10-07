@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "aspect_ratio_widget.h"
 #include "icon.h"
+#include "best_time.h"
 
 class Interface : public QWidget
 {
@@ -37,6 +38,7 @@ private:
     AspectRatioWidget* mAspectRatio;
     Timer* mTimer;
     MineCounter* mMineCounter;
+    BestTime* mBestTime;
 
     QStatusBar* mStatusBar = nullptr;
 

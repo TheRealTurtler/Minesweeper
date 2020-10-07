@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
 aspect_ratio_widget.cpp \
+	best_time.cpp \
 	clickable_label.cpp \
 	custom_game_size.cpp \
 	game.cpp \
@@ -25,6 +26,7 @@ aspect_ratio_widget.cpp \
 
 HEADERS += \
 aspect_ratio_widget.h \
+	best_time.h \
 	clickable_label.h \
 	custom_game_size.h \
 	game.h \

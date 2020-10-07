@@ -83,11 +83,14 @@ void Game::clearGame()
 // Zufällig Mienen auf dem Spielfeld verteilen
 void Game::spreadMines(const unsigned int amount)
 {
+    /*
     // Return wenn mehr Mienen platziert werden sollen, als Felder vorhanden sind
+    // -> Redundant, da bereits bei Größenauswahl überprüft
     if(amount > mMineGrid.size())
     {
         return;
     }
+    */
 
     // Vectorgröße der Felder mit Mienen anpassen
     mExplosiveFields.resize(amount);
@@ -351,6 +354,8 @@ void Game::searchField(MineField *mineField)
             i->setImage(QPixmap(":/resources/field.png") ,QPixmap(":/resources/mine.png"));
         }
 
+        mGameOver = true;
+
         // Signal für Spiel gewonnen ausgeben
         emit gameFinished(true);
 
@@ -359,8 +364,6 @@ void Game::searchField(MineField *mineField)
     }
     else
     {
-        // TODO Game Over
-
         mGameOver = true;
 
         // Alle Mienen explodieren
@@ -498,7 +501,11 @@ void Game::slotSearchField()
     // Überprüfen, ob Spiel noch läuft
     if(mGameOver)
     {
-        // Game Over
+        // Metalldetektor ausschalten
+        if(mMetalDetector)
+        {
+            setMetaldetector(false);
+        }
 
         return;
     }

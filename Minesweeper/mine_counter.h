@@ -20,4 +20,4 @@ private:
     QLabel* mCounterLabel = nullptr;
 };
 
-#endif // MINECOUNTER_H
+#endif // MINE_COUNTER_H
