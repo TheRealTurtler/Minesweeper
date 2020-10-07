@@ -1,5 +1,6 @@
 #include "best_time.h"
 
+// Constructor
 BestTime::BestTime(QWidget *parent) : QWidget(parent)
 {
     //Layout erstellen
@@ -18,6 +19,7 @@ BestTime::BestTime(QWidget *parent) : QWidget(parent)
     layout->addWidget(mBestTimeLabel);
 }
 
+// Bestzeit laden und anzeigen
 void BestTime::displayBestTime(unsigned int columns, unsigned int rows, unsigned int mines)
 {
     // Dateipfad festlegen
@@ -59,6 +61,7 @@ void BestTime::displayBestTime(unsigned int columns, unsigned int rows, unsigned
         {
             bestTime = inStream.readLine();
 
+            // Aufteilung in Minuten und Sekunden
             auto list = bestTime.split(':');
 
             mMinutes = list.at(0).toUInt();
@@ -68,6 +71,7 @@ void BestTime::displayBestTime(unsigned int columns, unsigned int rows, unsigned
         }
         else
         {
+            // Eintrag für Spielfeldgröße vorhanden, aber keine Zeit dazu
             bestTime = "--:--";
 
             mBestTimeAvailable = false;
@@ -87,6 +91,7 @@ void BestTime::displayBestTime(unsigned int columns, unsigned int rows, unsigned
     file.close();
 }
 
+// Neue Bestzeit speichern
 void BestTime::saveBestTime(unsigned int columns, unsigned int rows, unsigned int mines, unsigned int minutes, unsigned int seconds)
 {
     // Dateipfad festlegen
@@ -120,6 +125,7 @@ void BestTime::saveBestTime(unsigned int columns, unsigned int rows, unsigned in
         }
     }
 
+    // Spielfeldgröße nicht vorhanden -> hinzufügen
     if(!sizeFound)
     {
         ioStream << QString("[%1x%2x%3]").arg(columns).arg(rows).arg(mines) << Qt::endl;
@@ -137,21 +143,25 @@ void BestTime::saveBestTime(unsigned int columns, unsigned int rows, unsigned in
     file.close();
 }
 
+// Gibt die Anzahl der Minuten der Bestzeit zurück
 unsigned int BestTime::minutes() const
 {
     return mMinutes;
 }
 
+// Gibt die Anzahl der Sekunden der Bestzeit zurück
 unsigned int BestTime::seconds() const
 {
     return mSeconds;
 }
 
+// Gibt die Anzahl der Minuten und Sekunden der Bestzeit in Sekunden zurück
 unsigned int BestTime::totalSeconds() const
 {
     return mMinutes * 60 + mSeconds;
 }
 
+// Gibt zurück, ob eine Zeit geladen werden konnte
 bool BestTime::available() const
 {
     return mBestTimeAvailable;
