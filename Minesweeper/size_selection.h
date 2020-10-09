@@ -2,8 +2,11 @@
 #define SIZE_SELECTION_H
 
 #include <QVBoxLayout>
+#include <QTimer>
 
 #include "clickable_label.h"
+
+#include <QDebug>
 
 class SizeSelection : public ClickableLabel
 {
@@ -23,10 +26,22 @@ public:
     GameSize gameSize() const;
     void setGameSize(GameSize gameSize);
 
+public slots:
+    void resizeFont();
+
+protected:
+    virtual void resizeEvent(QResizeEvent *event) override;
+
 signals:
 
 private:
     GameSize mGameSize;
+    QTimer* mResizeTimer = nullptr;
+
+    QLabel* mLabelSizeName = nullptr;
+    QLabel* mLabelSizeNumbers = nullptr;
+
+    void initResizeTimer();
 
 };
 
