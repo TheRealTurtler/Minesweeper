@@ -73,8 +73,6 @@ SizeSelection::SizeSelection(GameSize gameSize, QWidget *parent) : ClickableLabe
     layout->addWidget(mLabelSizeName);
     layout->addWidget(mLabelSizeNumbers);
     //layout->addStretch(0);
-
-    initResizeTimer();
 }
 
 // Gewählte Spielfeldgröße zurückgeben
@@ -84,101 +82,45 @@ SizeSelection::GameSize SizeSelection::gameSize() const
 }
 
 // Auswahl Spielfeldgröße auswählen
-void SizeSelection::setGameSize(SizeSelection::GameSize gameSize)
+void SizeSelection::setGameSize(const SizeSelection::GameSize gameSize)
 {
     mGameSize = gameSize;
 }
 
-// Berechnung und Änderung der Schriftgröße
-void SizeSelection::resizeFont()
+// Gibt die Schrift des Namens-Labels zurück (Name und Größe haben gleiche Formatierung)
+QFont SizeSelection::labelFont() const
 {
-    QLabel* biggerLabel;
-    QLabel* smallerLabel;
+    return mLabelSizeName->font();
+}
 
+// Schriftgröße setzen
+void SizeSelection::setLabelFont(const QFont font)
+{
+    mLabelSizeName->setFont(font);
+    mLabelSizeNumbers->setFont(font);
+}
+
+// Gibt den Text des größten Labels (also den längsten Text) zurück
+QString SizeSelection::bigLabelText() const
+{
+    return biggestLabel()->text();
+}
+
+QRect SizeSelection::bigLabelContentsRect() const
+{
+    return biggestLabel()->contentsRect();
+}
+
+// PRIVATE | Größtes Label ausgeben
+QLabel *SizeSelection::biggestLabel() const
+{
     // Bestimmen, welcher Text länger ist
     if (QFontMetrics(mLabelSizeName->font()).boundingRect(mLabelSizeName->text()).width() > QFontMetrics(mLabelSizeNumbers->font()).boundingRect(mLabelSizeNumbers->text()).width())
     {
-        biggerLabel = mLabelSizeName;
-        smallerLabel = mLabelSizeNumbers;
+        return mLabelSizeName;
     }
     else
     {
-        biggerLabel = mLabelSizeNumbers;
-        smallerLabel = mLabelSizeName;
+        return mLabelSizeNumbers;
     }
-
-    // Aktuelle Texteigenschaften auslesen
-    QFont baseFont = biggerLabel->font();
-    const QRect baseTextRect = biggerLabel->contentsRect();
-    const QString baseText = biggerLabel->text();
-
-    // qMax gibt Maximum an
-    // pixelSize = -1, wenn Schriftgröße mit setPointSize() festgelegt wurde
-    // Schriftgrößen kleiner als 12 werden unlesbar
-    unsigned int fontSize = qMax(12, baseFont.pixelSize());
-
-    // Schrift vergrößern
-    while(true)
-    {
-        QFont testFont(baseFont);
-
-        testFont.setPixelSize(fontSize);
-
-        const QRect testTextBoundingRect = QFontMetrics(testFont).boundingRect(baseText);
-
-        // Nur Breite wichtig, da Text sowieso breiter als hoch
-        if(testTextBoundingRect.width() > baseTextRect.width())
-        {
-            // Break, wenn Schrift breiter als die Textbox
-            break;
-        }
-
-        ++fontSize;
-    }
-
-    // Schrift verkleinern
-    while(fontSize > 12)
-    {
-        QFont testFont(baseFont);
-
-        testFont.setPixelSize(fontSize);
-
-        const QRect testTextBoundingRect = QFontMetrics(testFont).boundingRect(baseText);
-
-        // Nur Breite wichtig, da Text sowieso breiter als hoch
-        if(testTextBoundingRect.width() <= baseTextRect.width())
-        {
-            // Break, wenn Schrift wieder kleiner oder gleich Textbox
-            break;
-        }
-
-        --fontSize;
-    }
-
-    // Neue Schriftgröße festlegen
-    baseFont.setPixelSize(fontSize);
-    biggerLabel->setFont(baseFont);
-    smallerLabel->setFont(baseFont);
-}
-
-// EVENT | Größe geändert
-void SizeSelection::resizeEvent(QResizeEvent *event)
-{
-    // Resize-Timer neustarten
-    mResizeTimer->start();
-
-    // Event weitergeben
-    ClickableLabel::resizeEvent(event);
-}
-
-// Timer initialisieren
-void SizeSelection::initResizeTimer()
-{
-    // Neuen single-shot Timer erstellen mit 100ms timeout
-    mResizeTimer = new QTimer(this);
-    mResizeTimer->setInterval(10);
-    mResizeTimer->setSingleShot(true);
-
-    // Timeout-Signal mit Schriftgrößenänderung verbinden
-    connect(mResizeTimer, &QTimer::timeout, this, &SizeSelection::resizeFont);
 }

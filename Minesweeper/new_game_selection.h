@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <QGridLayout>
-//#include <QPushButton>
 #include <QVBoxLayout>
+#include <QTimer>
 
 #include "aspect_ratio_widget.h"
 #include "size_selection.h"
@@ -30,6 +30,10 @@ public:
 public slots:
     void selectSize();
     void selectCustomFinished();
+    void resizeFont();
+
+protected:
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void selectedDefaultSize(int size);
@@ -42,7 +46,11 @@ private:
 
     std::vector<SizeSelection*> mSelectionGrid;
 
-    CustomGameSize* mCustomGameSize;
+    CustomGameSize* mCustomGameSize = nullptr;
+
+    QTimer* mResizeTimer = nullptr;
+
+    void initResizeTimer();
 };
 
 #endif // NEW_GAME_SELECTION_H

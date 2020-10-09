@@ -66,6 +66,9 @@ NewGameSelection::NewGameSelection(QWidget* parent) : QDialog(parent)
 
     // AspectRatio zu Layout hinzufügen
     layout->addWidget(aspectRatio);
+
+    // Resize-Timer initialisieren
+    initResizeTimer();
 }
 
 // Spaltenanzahl zurückgeben
@@ -173,4 +176,101 @@ void NewGameSelection::selectCustomFinished()
         // Speicher des Auswahlfensters wieder freigeben
         delete mCustomGameSize;
     }
+}
+
+// Berechnung und Änderung der Schriftgröße
+void NewGameSelection::resizeFont()
+{
+    //QLabel* biggestLabel = mSelectionGrid.at(0)->biggestLabel();
+
+    // Aktuelle Texteigenschaften auslesen
+    QFont labelFont = mSelectionGrid.at(0)->labelFont();
+    const QRect baseTextRect = mSelectionGrid.at(0)->contentsRect();
+    const QFontMetrics labelFontMetrics(labelFont);
+    QString labelText = mSelectionGrid.at(0)->bigLabelText();
+
+    // Längsten Text ermitteln
+    for (decltype (mSelectionGrid.size()) i = 1; i < mSelectionGrid.size(); ++i)
+    {
+        const QString labelText2 = mSelectionGrid.at(i)->bigLabelText();
+
+        if (labelFontMetrics.boundingRect(labelText2).width() > labelFontMetrics.boundingRect(labelText).width())
+        {
+            labelText = mSelectionGrid.at(i)->bigLabelText();
+        }
+    }
+
+    // qMax gibt Maximum an
+    // pixelSize = -1, wenn Schriftgröße mit setPointSize() festgelegt wurde
+    // Schriftgrößen kleiner als 12 werden unlesbar
+    unsigned int fontSize = qMax(12, labelFont.pixelSize());
+
+    // Schrift vergrößern
+    while(true)
+    {
+        QFont testFont(labelFont);
+
+        testFont.setPixelSize(fontSize);
+
+        const QRect testTextBoundingRect = QFontMetrics(testFont).boundingRect(labelText);
+
+        // Nur Breite wichtig, da Text sowieso breiter als hoch
+        if(testTextBoundingRect.width() > baseTextRect.width())
+        {
+            // Break, wenn Schrift breiter als die Textbox
+            break;
+        }
+
+        ++fontSize;
+    }
+
+    // Schrift verkleinern
+    while(fontSize > 12)
+    {
+        QFont testFont(labelFont);
+
+        testFont.setPixelSize(fontSize);
+
+        const QRect testTextBoundingRect = QFontMetrics(testFont).boundingRect(labelText);
+
+        // Nur Breite wichtig, da Text sowieso breiter als hoch
+        if(testTextBoundingRect.width() <= baseTextRect.width())
+        {
+            // Break, wenn Schrift wieder kleiner oder gleich Textbox
+            break;
+        }
+
+        --fontSize;
+    }
+
+    // Neue Schriftgröße festlegen
+    labelFont.setPixelSize(fontSize);
+
+    // Schrift auf alle Labels anwenden
+    for (decltype (mSelectionGrid.size()) i = 0; i < mSelectionGrid.size(); ++i)
+    {
+        mSelectionGrid.at(i)->setLabelFont(labelFont);
+    }
+}
+
+// EVENT | Größe geändert
+void NewGameSelection::resizeEvent(QResizeEvent *event)
+{
+    // Resize-Timer neustarten
+    mResizeTimer->start();
+
+    // Event weitergeben
+    QDialog::resizeEvent(event);
+}
+
+// Timer initialisieren
+void NewGameSelection::initResizeTimer()
+{
+    // Neuen single-shot Timer erstellen mit 100ms timeout
+    mResizeTimer = new QTimer(this);
+    mResizeTimer->setInterval(100);
+    mResizeTimer->setSingleShot(true);
+
+    // Timeout-Signal mit Schriftgrößenänderung verbinden
+    connect(mResizeTimer, &QTimer::timeout, this, &NewGameSelection::resizeFont);
 }
